@@ -29,8 +29,8 @@ class MiniMilitia {
         ]).then(([backgroundMain, spritesheet, spriteMap]) => {
 
             this.context.drawImage(backgroundMain, 0, 0, this.GAME_WIDTH, this.GAME_HEIGHT);
-            
-            var sprite = new Sprite(spritesheet, 56);
+
+            var sprite = new Sprite(spritesheet);
             sprite.setMap(spriteMap);
 
             const anim = new Animator(this.FRAME_LIMIT);

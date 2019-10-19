@@ -1,8 +1,7 @@
 class Sprite {
 
-    constructor(image, widthOffset) {
+    constructor(image) {
         this.image = image;
-        this.widthOffset = widthOffset;
         this.objects = new Map();
     }
 
@@ -11,7 +10,7 @@ class Sprite {
         buffer.width = width;
         buffer.height = height;
         buffer.getContext('2d').drawImage(this.image,
-            x - this.widthOffset, y - this.widthOffset, width, height, 
+            x, y, width, height, 
             0, 0, width, height);
         this.objects.set(name, buffer);
     }

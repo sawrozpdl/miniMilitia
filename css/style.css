@@ -3,9 +3,18 @@
     padding: 0px;
 }
 
+body {
+    background: black;
+}
+
+.main-wrapper {
+    margin: auto;
+    padding: 50px;
+    width : 962px;
+}
 
 #game-container {
-    
+    border: 1px solid red;
 }
 
 

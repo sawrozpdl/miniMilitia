@@ -1,7 +1,13 @@
 import Sprite from '/js/utils/Sprite.js';
 import Animator from '/js/utils/Animator.js';
 import Layers from '/js/utils/Layers.js';
-import {loadImage, loadJson} from '/js/utils/Loader.js';
+import Keyboard from '/js/events/Keyboard.js';
+import Mouse from '/js/events/Mouse.js';
+import {
+    loadImage,
+    loadJson,
+    loadAudio
+} from '/js/utils/Loader.js';
 
 
 class Main {
@@ -12,12 +18,12 @@ class Main {
         this.GAME_HEIGHT = height;
         this.FRAME_LIMIT = 60;
         this.context = this.canvas.getContext('2d');
-
         this.layers = new Layers(this.context);
         this.animation = new Animator(this.FRAME_LIMIT);
         this.background = null;
         this.sprite = null;
-
+        this.keyListener = new Keyboard();
+        this.MouseListener = new Mouse(this.canvas);
         this.setDimensions();
     }
 
@@ -33,45 +39,48 @@ class Main {
 
         buffer.getContext('2d').drawImage(image, 0, 0, this.GAME_WIDTH, this.GAME_HEIGHT);
 
-        return function drawBackground(context) {
+        return (context) => {
             context.drawImage(buffer, 0, 0);
         }
     }
 
 
-    generateHead(sprite) {
+    generateHead(sprite) { // this function is for experimental purposes only
         let buffer = document.createElement('canvas');
         sprite.draw('indian-head', buffer.getContext('2d'), 0, 0, 0.5);
         var i = 0;
-        var speed = 5;
-        return function drawBackground(context) {
+        var speed = 1;
+        var rotateCallback = this.sprite.drawR('bomb', 100 , 100, 1);
+        return (context) => {
             if (i > 300 || i < 0) speed *= -1;
-            context.drawImage(buffer, i+=speed, 0);
+            context.drawImage(buffer, i += speed, 0);
+            rotateCallback(context, i);
+            i %= 360;
         }
     }
 
     deployLoadingScreen() {
-        loadImage('/assets/images/loading.png').then(loading => {
-            loadImage('./assets/images/logo.png').then(logo => {
-                var i = 0;
-                this.layers.push((context) => {
-                    context.fillRect(0, 0, this.GAME_WIDTH, this.GAME_HEIGHT);
-                    context.drawImage(logo, 0, 0,
-                        logo.width, logo.height,
-                        (this.GAME_WIDTH -  logo.width) / 2,
-                        (this.GAME_HEIGHT -  2 * logo.height) / 2,
-                        logo.width, logo.height);
-                    context.drawImage(loading, loading.height * i, 0,
-                        loading.height, loading.height,
-                        (this.GAME_WIDTH - loading.height) / 2,
-                        (this.GAME_HEIGHT + loading.height) / 2,
-                        loading.height, loading.height);
-                    i = ++i % 8;
-                });
-                this.animation.setFrameLimit(20);
-                this.startAnimation();
-                }
-            );
+        Promise.all([
+            loadImage('/assets/images/loading.png'),
+            loadImage('./assets/images/logo.png')
+        ]).then(([loading, logo]) => {
+            var i = 0;
+            this.layers.push((context) => {
+                context.fillRect(0, 0, this.GAME_WIDTH, this.GAME_HEIGHT);
+                context.drawImage(logo, 0, 0,
+                    logo.width, logo.height,
+                    (this.GAME_WIDTH - logo.width) / 2,
+                    (this.GAME_HEIGHT - 2 * logo.height) / 2,
+                    logo.width, logo.height);
+                context.drawImage(loading, loading.height * i, 0,
+                    loading.height, loading.height,
+                    (this.GAME_WIDTH - loading.height) / 2,
+                    (this.GAME_HEIGHT + loading.height) / 2,
+                    loading.height, loading.height);
+                i = ++i % 8;
+            });
+            this.animation.setFrameLimit(this.FRAME_LIMIT / 4);
+            this.startAnimation();
         });
     }
 
@@ -92,13 +101,15 @@ class Main {
             this.sprite.setMap(spriteMap);
 
             this.dumpLoadingScreen();
-            this.animation.setFrameLimit(this.FRAME_LIMIT);
+            //this.animation.setFrameLimit(this.FRAME_LIMIT);
             this.launch();
         });
     }
 
     launch() {
         this.setLayers();
+        this.keyListener.for(32, (e) => {console.log("space!")});
+        this.MouseListener.for('mouseenter', (e) => {console.log(e.clientX, e.clientY)});
     }
 
     setLayers() {
@@ -112,7 +123,6 @@ class Main {
         };
         this.animation.animate();
     }
-
 }
 
 export default Main;

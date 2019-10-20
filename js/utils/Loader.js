@@ -2,7 +2,6 @@ export function loadImage(url) {
     return new Promise(resolve => {
                 var img = new Image();
                 img.addEventListener('load', () => {
-                    //setTimeout(resolve, 3000, img); //a loading screen ?
                     resolve(img);
                 });
                 img.src = url;
@@ -13,7 +12,8 @@ export function loadImage(url) {
 export function loadJson(url) {
     return new Promise(resolve => {
         return fetch(url).then(response => {
-            resolve(response.json());
+            setTimeout(resolve, 5000, response.json()); //a loading screen ?
+            //resolve(response.json());
         });
     });
 }

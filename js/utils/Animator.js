@@ -19,6 +19,10 @@ class Animator {
         }
     }
 
+    setFrameLimit(flimit) {
+        this.frameLimit = flimit;
+    }
+
     animate() {
         requestAnimationFrame(this.update);
         //setTimeout(this.update, 1000 / 15, performance.now());

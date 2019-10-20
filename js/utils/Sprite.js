@@ -26,7 +26,8 @@ class Sprite {
     draw(name, context, x, y, scale) {
         let buffer = this.objects.get(name);
         context.drawImage(
-            buffer,x, y, buffer.width * scale, buffer.height * scale);
+            buffer,x, y,
+            buffer.width * scale, buffer.height * scale);
     }
 }
 

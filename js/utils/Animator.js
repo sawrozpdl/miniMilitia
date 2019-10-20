@@ -14,7 +14,6 @@ class Animator {
                 this.timeOffset -= (1 / this.frameLimit); 
             }
             this.previousTime = time;
-            console.log("helo");
             requestAnimationFrame(this.update);
             //setTimeout(this.update, 1000 / 15, performance.now()); // simulation
         }

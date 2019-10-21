@@ -16,7 +16,7 @@ class Main {
         this.canvas = canvas;
         this.GAME_WIDTH = width;
         this.GAME_HEIGHT = height;
-        this.FRAME_LIMIT = 60;
+        this.FRAME_LIMIT = 30;
         this.context = this.canvas.getContext('2d');
         this.layers = new Layers(this.context);
         this.animation = new Animator(this.FRAME_LIMIT);
@@ -47,15 +47,18 @@ class Main {
 
     generateHead(sprite) { // this function is for experimental purposes only
         let buffer = document.createElement('canvas');
-        sprite.draw('indian-head', buffer.getContext('2d'), 0, 0, 0.5);
+        var ibpx = 100;
+        var ibpy = 100;
+        sprite.draw('indian-body', buffer.getContext('2d'), 0, 0, 0.5);
         var i = 0;
         var speed = 1;
-        var rotateCallback = this.sprite.drawR('bomb', 100 , 100, 1);
+        var rotateCallback = this.sprite.drawR('indian-hand', ibpx , ibpy,"left", 1);
         return (context) => {
-            if (i > 300 || i < 0) speed *= -1;
-            context.drawImage(buffer, i += speed, 0);
-            rotateCallback(context, i);
-            i %= 360;
+            if (ibpx > 300 || ibpx < 0) speed *= -1;
+            context.drawImage(buffer, ibpx += speed, ibpy);
+            rotateCallback(context,ibpx, ibpy, 0);
+            i++;
+            i %= 90;
         }
     }
 

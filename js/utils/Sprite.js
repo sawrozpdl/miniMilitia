@@ -17,7 +17,7 @@ class Sprite {
 
     getDim(name) {
         var temp = this.objects.get(name);
-        return [temp.width, temp.height];
+        return {width : temp.width, height : temp.height};
     }
 
     setMap(json) {
@@ -48,7 +48,10 @@ class Sprite {
             buffer, -coord.x, -coord.y,
             buffer.width * scale, buffer.height * scale);
         context.restore();
+        
     }
+
+    
 }
 
 export default Sprite;

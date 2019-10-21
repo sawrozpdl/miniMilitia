@@ -3,6 +3,8 @@ import Animator from '/js/utils/Animator.js';
 import Layers from '/js/utils/Layers.js';
 import Keyboard from '/js/events/Keyboard.js';
 import Mouse from '/js/events/Mouse.js';
+import Player from '/js/objects/Player.js';
+import {Vector} from '/js/utils/Math.js';
 import {
     loadImage,
     loadJson,
@@ -16,7 +18,8 @@ class Main {
         this.canvas = canvas;
         this.GAME_WIDTH = width;
         this.GAME_HEIGHT = height;
-        this.FRAME_LIMIT = 30;
+        this.FRAME_LIMIT = 60;
+        this.speedFactor = 60 / this.FRAME_LIMIT;
         this.context = this.canvas.getContext('2d');
         this.layers = new Layers(this.context);
         this.animation = new Animator(this.FRAME_LIMIT);
@@ -24,11 +27,29 @@ class Main {
         this.sprite = null;
         this.keyListener = new Keyboard();
         this.MouseListener = new Mouse(this.canvas);
+
+        this.images = null;
+        this.audios = null;
+        this.Player = null;
+        this.mouse = null;
+    }
+
+    init() {
         this.mouse = {
             x: 0,
             y: 0
         };
         this.setDimensions();
+        this.Player = new Player(this.sprite, {
+            head : "korean-head",
+            body : "korean-body",
+            hand : "korean-hand",
+            leg : "korean-leg"
+        },this.playerPosition, this.mouse, 0.7, this.audios);
+        this.gravity = {
+            x : 0,
+            y : 5 * this.speedFactor
+        }
     }
 
     setDimensions() {
@@ -48,26 +69,12 @@ class Main {
         }
     }
 
-
-    generateHead(sprite) { // this function is for experimental purposes only
-        let buffer = document.createElement('canvas');
-        var ibpx = 100;
-        var ibpy = 100;
-        sprite.draw('indian-body', buffer.getContext('2d'), 0, 0, 1);
-        var i = 0;
-        var speed = 1;
-        return (context) => {
-            if (ibpx > 300 || ibpx < 0) speed *= -1;
-            context.drawImage(buffer, ibpx += speed, ibpy);
-            this.sprite.rotate('indian-hand', context, ibpx + 10,
-                ibpy + 10, 1,
-                Math.atan((this.mouse.y - ibpy) / (this.mouse.x - ibpx)), {
-                    x: 0,
-                    y: 1
-                });
-            i++;
-            i %= 360;
+    spawnPlayer() {
+        this.Player.position = {
+            x : 300,
+            y : 500
         }
+        this.layers.push(this.Player.draw());
     }
 
     deployLoadingScreen() {
@@ -112,13 +119,9 @@ class Main {
             this.sprite.setMap(spriteMap);
             this.dumpRecentScreen(); // which is loading screen
             this.animation.setFrameLimit(this.FRAME_LIMIT);
+            this.init();
             this.launch();
         });
-    }
-
-    setLayers() {
-        this.layers.push(this.generateBackground(this.background)); 
-        this.layers.push(this.generateHead(this.sprite));
     }
 
     startAnimation() {
@@ -129,13 +132,17 @@ class Main {
     }
 
     launch() {
-        this.setLayers();
+        this.layers.push(this.generateBackground(this.background)); 
+        this.spawnPlayer();
         this.keyListener.for(32, (e) => {
             console.log("space!");
         });
         this.MouseListener.for('mousemove', (e) => {
             this.mouse.x = e.clientX;
             this.mouse.y = e.clientY;
+        });
+        this.MouseListener.for('click', (e) => {
+            this.audios.punch.play();
         });
     }
 }

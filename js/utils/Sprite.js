@@ -43,7 +43,7 @@ class Sprite {
         };
         context.save();
         context.translate(x + coord.x, y + coord.y);
-        context.rotate(angle * Math.PI / 180);
+        context.rotate(angle);
         context.drawImage(
             buffer, -coord.x, -coord.y,
             buffer.width * scale, buffer.height * scale);

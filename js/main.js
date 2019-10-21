@@ -6,7 +6,7 @@ import Mouse from '/js/events/Mouse.js';
 import {
     loadImage,
     loadJson,
-    loadAudio
+    loadMedia
 } from '/js/utils/Loader.js';
 
 
@@ -24,6 +24,10 @@ class Main {
         this.sprite = null;
         this.keyListener = new Keyboard();
         this.MouseListener = new Mouse(this.canvas);
+        this.mouse = {
+            x: 0,
+            y: 0
+        };
         this.setDimensions();
     }
 
@@ -32,7 +36,7 @@ class Main {
         this.canvas.height = this.GAME_HEIGHT;
     }
 
-    generateBackground(image) {
+    generateBackground(image) { // stores the backgroud in buffer and passes to layers to draw
         let buffer = document.createElement('canvas');
         buffer.height = this.GAME_HEIGHT;
         buffer.width = this.GAME_WIDTH;
@@ -55,7 +59,12 @@ class Main {
         return (context) => {
             if (ibpx > 300 || ibpx < 0) speed *= -1;
             context.drawImage(buffer, ibpx += speed, ibpy);
-            this.sprite.rotate('indian-hand',context, ibpx + 10, ibpy + 10, 1, i, {x : 0, y: 1});
+            this.sprite.rotate('indian-hand', context, ibpx + 10,
+                ibpy + 10, 1,
+                Math.atan((this.mouse.y - ibpy) / (this.mouse.x - ibpx)), {
+                    x: 0,
+                    y: 1
+                });
             i++;
             i %= 360;
         }
@@ -81,7 +90,7 @@ class Main {
                     loading.height, loading.height);
                 i = ++i % 8;
             });
-            this.animation.setFrameLimit(this.FRAME_LIMIT);
+            this.animation.setFrameLimit(this.FRAME_LIMIT / 4);
             this.startAnimation();
         });
     }
@@ -93,29 +102,22 @@ class Main {
     loadAssets() {
         this.deployLoadingScreen();
         Promise.all([
-            loadImage('/assets/images/background.png'),
-            loadImage('/assets/images/objects.png'),
+            loadMedia('/json/assets.json'),
             loadJson('/json/spriteMap.json')
-        ]).then(([background, spritesheet, spriteMap]) => {
-            this.background = background;
-
-            this.sprite = new Sprite(spritesheet);
+        ]).then(([media, spriteMap]) => {
+            this.images = media.images;
+            this.audios = media.audios;
+            this.background = this.images.background;
+            this.sprite = new Sprite(this.images.spritesheet);
             this.sprite.setMap(spriteMap);
-
-            this.dumpRecentScreen();
-            //this.animation.setFrameLimit(this.FRAME_LIMIT);
+            this.dumpRecentScreen(); // which is loading screen
+            this.animation.setFrameLimit(this.FRAME_LIMIT);
             this.launch();
         });
     }
 
-    launch() {
-        this.setLayers();
-        this.keyListener.for(32, (e) => {console.log("space!")});
-        this.MouseListener.for('mouseenter', (e) => {console.log(e.clientX, e.clientY)});
-    }
-
     setLayers() {
-        this.layers.push(this.generateBackground(this.background)); // stores the backgroud in buffer and passes to layers to draw
+        this.layers.push(this.generateBackground(this.background)); 
         this.layers.push(this.generateHead(this.sprite));
     }
 
@@ -124,6 +126,17 @@ class Main {
             this.layers.draw();
         };
         this.animation.animate();
+    }
+
+    launch() {
+        this.setLayers();
+        this.keyListener.for(32, (e) => {
+            console.log("space!");
+        });
+        this.MouseListener.for('mousemove', (e) => {
+            this.mouse.x = e.clientX;
+            this.mouse.y = e.clientY;
+        });
     }
 }
 

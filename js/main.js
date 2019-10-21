@@ -49,16 +49,15 @@ class Main {
         let buffer = document.createElement('canvas');
         var ibpx = 100;
         var ibpy = 100;
-        sprite.draw('indian-body', buffer.getContext('2d'), 0, 0, 0.5);
+        sprite.draw('indian-body', buffer.getContext('2d'), 0, 0, 1);
         var i = 0;
         var speed = 1;
-        var rotateCallback = this.sprite.drawR('indian-hand', ibpx , ibpy,"left", 1);
         return (context) => {
             if (ibpx > 300 || ibpx < 0) speed *= -1;
             context.drawImage(buffer, ibpx += speed, ibpy);
-            rotateCallback(context,ibpx, ibpy, 0);
+            this.sprite.rotate('indian-hand',context, ibpx + 10, ibpy + 10, 1, i, {x : 0, y: 1});
             i++;
-            i %= 90;
+            i %= 360;
         }
     }
 
@@ -82,12 +81,12 @@ class Main {
                     loading.height, loading.height);
                 i = ++i % 8;
             });
-            this.animation.setFrameLimit(this.FRAME_LIMIT / 4);
+            this.animation.setFrameLimit(this.FRAME_LIMIT);
             this.startAnimation();
         });
     }
 
-    dumpLoadingScreen() {
+    dumpRecentScreen() {
         this.layers.pop();
     }
 
@@ -103,7 +102,7 @@ class Main {
             this.sprite = new Sprite(spritesheet);
             this.sprite.setMap(spriteMap);
 
-            this.dumpLoadingScreen();
+            this.dumpRecentScreen();
             //this.animation.setFrameLimit(this.FRAME_LIMIT);
             this.launch();
         });

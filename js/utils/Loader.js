@@ -6,7 +6,6 @@ export function loadImage(url) {
                 });
                 img.src = url;
             });
-
 }
 
 export function loadAudio(url) {

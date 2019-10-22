@@ -3,6 +3,7 @@ import Hand from "/js/objects/Hand.js";
 import Body from "/js/objects/Body.js";
 import Leg from "/js/objects/Leg.js";
 import {Vector} from '/js/utils/Math.js';
+import Gun from "/js/objects/Gun.js";
 
 class Entity {
 
@@ -111,14 +112,15 @@ class Entity {
         var rotation = 0;
         var rotationSpeed = 1;
         var maxRotation = 45;
-        this.audios.walk.playbackRate = 0.5;
-        this.audios.jet.volume = 0.2;
+        this.audios.walk.playbackRate = 0.2;
+        this.audios.jet.volume = 0.6;
         this.audios.walk.volume = 0.5;
+
+        this.parts.lHand.equip(new Gun(this.parts.lHand, 'uzi')); // spawn player with a gun at first
+        this.parts.rHand.equip(new Gun(this.parts.rHand, 'uzi'));
         return (context) => {
             if (this.isFlying) this.audios.jet.play();
-    
             if (!this.isWalking && !this.isFlying) angle = 0;
-            if (this.isWalking && !this.isFlying) angle = 0;
             else this.audios.walk.play();
 
             bufferCtx.clearRect(0, 0, buffer.width, buffer.height);
@@ -141,7 +143,6 @@ class Entity {
                 bPart.gPosition.y = this.position.y + bPart.lPosition.y;
             }
             
-
             if (!this.isFlying && this.position.y <= 499) this.velocity.add(this.gravity);
 
             this.position.add(this.velocity);
@@ -159,7 +160,6 @@ class Entity {
             }
             rotation += rotationSpeed;
 
-            console.log(rotation);
             this.sprite.rotate(buffer, context,
                 this.position.x, this.position.y,
                 1, rotation * (Math.PI / 180), {x : 1, y : 1});

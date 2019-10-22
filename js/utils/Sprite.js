@@ -38,8 +38,8 @@ class Sprite {
     rotate(element, context, x, y, scale, angle, orientation) {
         let buffer = (element instanceof HTMLCanvasElement) ? element : this.objects.get(element);
         var coord = { // 0,0 for lefttop, 0,1 for leftcenter, 0,2 for leftbottom ...
-            x: orientation.x * (buffer.width / 2),
-            y: orientation.y * (buffer.height / 2)
+            x: orientation.x * (buffer.width / 2) * scale,
+            y: orientation.y * (buffer.height / 2) * scale
         };
         context.save();
         context.translate(x + coord.x, y + coord.y);

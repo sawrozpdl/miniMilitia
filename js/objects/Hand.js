@@ -10,6 +10,8 @@ class Hand extends BodyPart{
         this.dimensions = this.sprite.getDim(this.spriteName);
         this.hasEquippedGun = false;
         this.equippedGun = null;
+
+        this.angle = 0;
     }
 
     punch() {
@@ -29,9 +31,11 @@ class Hand extends BodyPart{
 
     draw(context) {
         console.log();
+        this.angle = Math.atan((this.mouse.y - this.gPosition.y) / (this.mouse.x - this.gPosition.x));
+        if (this.hasEquippedGun) this.equippedGun.draw(context);
         this.sprite.rotate(this.spriteName,
-             context, this.lPosition.x, this.lPosition.y, this.scale,
-              Math.atan((this.mouse.y - this.gPosition.y) / (this.mouse.x - this.gPosition.x)),
+             context, this.lPosition.x, this.lPosition.y,
+              this.scale,this.angle,
               {x : 0, y : 1});
     }
 

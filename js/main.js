@@ -41,10 +41,10 @@ class Main {
         };
         this.setDimensions();
         this.player = new Player(this.sprite, {
-            head : "bot-head",
-            body : "bot-body",
-            hand : "bot-hand",
-            leg : "bot-leg"
+            head : "korean-head",
+            body : "korean-body",
+            hand : "korean-hand",
+            leg : "korean-leg"
         },this.playerPosition, this.mouse, 0.7, this.audios);
     }
 

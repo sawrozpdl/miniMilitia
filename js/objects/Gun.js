@@ -2,8 +2,8 @@ import Weapon from '/js/objects/Weapon.js';
 
 class Gun extends Weapon {
 
-    constructor() {
-
+    constructor(hand) {
+        
     }
     
 }

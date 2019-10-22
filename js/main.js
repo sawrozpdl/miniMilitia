@@ -30,7 +30,7 @@ class Main {
 
         this.images = null;
         this.audios = null;
-        this.Player = null;
+        this.player = null;
         this.mouse = null;
     }
 
@@ -40,7 +40,7 @@ class Main {
             y: 0
         };
         this.setDimensions();
-        this.Player = new Player(this.sprite, {
+        this.player = new Player(this.sprite, {
             head : "korean-head",
             body : "korean-body",
             hand : "korean-hand",
@@ -70,11 +70,8 @@ class Main {
     }
 
     spawnPlayer() {
-        this.Player.position = {
-            x : 300,
-            y : 500
-        }
-        this.layers.push(this.Player.draw());
+        this.player.position = new Vector(300, 500);
+        this.layers.push(this.player.draw());
     }
 
     deployLoadingScreen() {
@@ -131,19 +128,38 @@ class Main {
         this.animation.animate();
     }
 
-    launch() {
+    setBackground() {
         this.layers.push(this.generateBackground(this.background)); 
-        this.spawnPlayer();
-        this.keyListener.for(32, (e) => {
-            console.log("space!");
+    }
+
+    setEventListeners() {
+        this.keyListener.for(68, (down) => {
+            this.player.moveRight();
+        }, (up) => {
+            this.player.stop();
         });
+
+        this.keyListener.for(65, (down) => {
+            this.player.moveLeft();
+        }, (up) => {
+            this.player.stop();
+        });
+
         this.MouseListener.for('mousemove', (e) => {
             this.mouse.x = e.clientX;
             this.mouse.y = e.clientY;
         });
+
         this.MouseListener.for('click', (e) => {
-            this.audios.punch.play();
+            console.log(this.player);
+            this.player.shoot();
         });
+    }
+
+    launch() {
+        this.setBackground();
+        this.spawnPlayer();
+        this.setEventListeners();
     }
 }
 

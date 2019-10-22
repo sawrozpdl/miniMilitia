@@ -6,6 +6,8 @@ class BodyPart {
         this.scale = entity.scale;
 
         this.dimensions = undefined;
+        this.lPosition = {x : 0, y : 0}
+        this.gPosition = {x : 0, y : 0}
     }
 
     getHeight() {
@@ -16,8 +18,8 @@ class BodyPart {
         return this.dimensions.width;
     }
 
-    draw(context, x, y) {
-        this.sprite.draw(this.spriteName, context, x, y, this.scale);
+    draw(context) {
+        this.sprite.draw(this.spriteName, context, this.lPosition.x, this.lPosition.y, this.scale);
     }
 }
 

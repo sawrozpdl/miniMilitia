@@ -48,9 +48,17 @@ class Sprite {
             buffer, -coord.x, -coord.y,
             buffer.width * scale, buffer.height * scale);
         context.restore();
-        
     }
 
+    flip(name, context) {
+        let buffer = this.objects.get(name);
+        var posX = buffer.width * -1;
+        var posY =  0; 
+        context.save();
+        context.scale(-1, 1);  // horizontal flip 1, -1 for verical one
+        context.drawImage(buffer, posX, posY, buffer.width, buffer.height);
+        context.restore();
+    };
     
 }
 

@@ -2,36 +2,32 @@ class Keyboard {
 
     constructor() {
         this.keyMap = new Map();
-        this.keyState = new Map();
-
-        ['keyup', 'keydown'].forEach(item => {
-            window.addEventListener(item, (event) => {
-                this.handleClick(event);
-            });
+        window.addEventListener('keydown', (event) => {
+            this.handleDown(event);
+        });
+        window.addEventListener('keyup', (event) => {
+            this.handleUp(event);
         });
     }
 
-    handleClick(event) {
+    handleDown(event) {
         const keyCode = event.keyCode;
         if (!this.keyMap.has(keyCode))
             return;
         event.preventDefault();
-
-        const state = (event.type == 'keydown') ? 1 : -1;
-
-        if (state == this.keyState.get(keyCode)) {
-            console.log("equal");
-            return
-        }
-            
-
-        this.keyState.set(keyCode, state);
-
-        this.keyMap.get(keyCode)(event);
+        this.keyMap.get(keyCode)[0](event);
     } 
 
-    for(keyCode, callback) {
-        this.keyMap.set(keyCode, callback);
+    handleUp(event) {
+        const keyCode = event.keyCode;
+        if (!this.keyMap.has(keyCode))
+            return;
+        event.preventDefault();
+        this.keyMap.get(keyCode)[1](event);
+    }
+
+    for(keyCode, callbackDown, callbackUp) {
+        this.keyMap.set(keyCode, [callbackDown, callbackUp]);
     }
 
 }

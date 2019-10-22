@@ -2,6 +2,7 @@ import Head from "/js/objects/Head.js";
 import Hand from "/js/objects/Hand.js";
 import Body from "/js/objects/Body.js";
 import Leg from "/js/objects/Leg.js";
+import {Vector} from '/js/utils/Math.js';
 
 class Entity {
 
@@ -14,21 +15,27 @@ class Entity {
         this.isLimited = false; // timespan infinite if not killed
         this.isKilled = false;
         this.position = position;
-        this.thruster = 20;
-        this.health = 20;
+        this.thruster = 100;
+        this.health = 100;
+        this.dthruster = 1;
+        this.dhealth = 0.5;
         this.isFacingRight = true;
+        this.isWalking = false;
+        this.velocity = new Vector(0, 0);
+        this.parts = {
+            head : new Head(this),
+            lHand : new Hand(this, true),
+            rHand : new Hand(this, false),
+            body : new Body(this),
+            lLeg : new Leg(this, true),
+            rLeg : new Leg(this, false)
+        }
+        
 
-        this.head = new Head(this);
-        this.lHand = new Hand(this, true);
-        this.rHand = new Hand(this, false);
-        this.body = new Body(this);
-        this.lLeg = new Leg(this, true);
-        this.rLeg = new Leg(this, false);
-
-        this.height = (this.head.getHeight() + 
-                      this.body.getHeight() +
-                      this.lLeg.getHeight()) * 0.93; //parts are intersected
-        this.width = this.body.getWidth() + this.lHand.getWidth() / (3 / 2); //hands are intersected
+        this.height = (this.parts.head.getHeight() + 
+                      this.parts.body.getHeight() +
+                      this.parts.lLeg.getHeight()) * 0.93; //parts are intersected
+        this.width = this.parts.body.getWidth() + this.parts.lHand.getWidth() / (3 / 2); //hands are intersected
     }
 
     thruster() {
@@ -51,46 +58,71 @@ class Entity {
         this.position.add(vector);
     }
 
-    turnAround() {
-        this.isFacingRight = !this.isFacingRight;
+    shoot() {
+
+    }
+
+    moveLeft() {
+        this.isWalking = true;
+        this.isFacingRight = false;
+        this.velocity.x = -2;
+    }
+
+    moveRight() {
+        this.isWalking = true;
+        this.isFacingRight = true;
+        this.velocity.x = +2;
+    }
+
+    stop() {
+        this.isWalking = false;
+        this.velocity.x = 0;
     }
 
     draw() {
         let buffer = document.createElement('canvas');
         buffer.height = this.height * this.scale;
         buffer.width = this.width * this.scale;
-        buffer.fillstyle = 'green';
+        var bufferCtx = buffer.getContext('2d');
+        // buffer.fillstyle = 'green';
+        // bufferCtx.fillRect(0,0,buffer.width, buffer.height);
 
-        //buffer.getContext('2d').fillRect(0,0,buffer.width, buffer.height);
-
-        var body = {x : 10 * this.scale, y : (this.head.getHeight() - 10) * this.scale};
-        var lleg = {x : 17 * this.scale, y : body.y + (this.body.getHeight() - 10) * this.scale}
-        var rleg = {x : (this.body.getWidth() * this.scale + 5 * this.scale) / 2, y : lleg.y}
-        var lhand = {x : this.scale * 15, y: body.y + 10 * this.scale}
-        var rhand = {x : rleg.x + this.scale * 10, y : lhand.y}
+        this.parts.head.lPosition = {x : 0, y : 0}
+        this.parts.body.lPosition = {x : 10 * this.scale, y : (this.parts.head.getHeight() - 10) * this.scale};
+        this.parts.lLeg.lPosition = {x : 17 * this.scale, y : this.parts.body.lPosition.y + (this.parts.body.getHeight() - 15) * this.scale}
+        this.parts.rLeg.lPosition = {x : (this.parts.body.getWidth() * this.scale + 5 * this.scale) / 2, y : this.parts.lLeg.lPosition.y}
+        this.parts.lHand.lPosition = {x : this.scale * 15, y: this.parts.body.lPosition.y + 10 * this.scale}
+        this.parts.rHand.lPosition = {x : this.parts.rLeg.lPosition.x + this.scale * 10, y : this.parts.lHand.lPosition.y}
         
-        var speed = 1;
-        var angle = 10 * speed;
+        var angle = 0;
+        var angularSpeed = 1;
+        this.audios.walk.playbackRate = 0.5;
+        this.audios.walk.volume = 0.5;
         return (context) => {
-            buffer.getContext('2d').clearRect(0, 0, buffer.width, buffer.height);
-            this.rHand.draw(buffer.getContext('2d'), rhand.x, rhand.y);
+            if (!this.isWalking) angle = 0;
+            else this.audios.walk.play();
+            console.log(angularSpeed);
+            bufferCtx.clearRect(0, 0, buffer.width, buffer.height);
 
+            this.parts.rHand.draw(bufferCtx);
+            this.parts.rLeg.rotate(bufferCtx, angle * (Math.PI / 180));
+            this.parts.lLeg.rotate(bufferCtx, -1 * angle* (Math.PI / 180));
 
-            this.rLeg.rotate(buffer.getContext('2d'), rleg.x, rleg.y, angle * (Math.PI / 180));
-            this.lLeg.rotate(buffer.getContext('2d'), lleg.x, lleg.y, -1 * angle * (Math.PI / 180));
-            if (this.position.x % 12 == 0) {
-                angle *= -1;
+            angle += angularSpeed;
+            if (angle > 10 || angle < -10) 
+                angularSpeed *= -1;
+            
+            this.parts.body.draw(bufferCtx);
+            this.parts.head.draw(bufferCtx);
+            this.parts.lHand.draw(bufferCtx);
+
+            for (var part in this.parts) {
+                var bPart = this.parts[part];
+                bPart.gPosition.x = this.position.x + bPart.lPosition.x;
+                bPart.gPosition.y = this.position.y + bPart.lPosition.y;
             }
-            this.body.draw(buffer.getContext('2d'), body.x, body.y);
-            this.head.draw(buffer.getContext('2d'), 0, 0);
-            this.lHand.draw(buffer.getContext('2d'), lhand.x, lhand.y);
 
-            this.lHand.position = {x : this.position.x + lhand.x, y : this.position.y + lhand.y};
-            this.rHand.position = {x : this.position.x + rhand.x, y : this.position.y + rhand.y};
-
-            if (this.position.x > 1000 || this.position.x < 300)
-                speed *= -1;
-            this.position.x += speed;
+            this.position.add(this.velocity);
             context.drawImage(buffer, this.position.x, this.position.y);
         }
 

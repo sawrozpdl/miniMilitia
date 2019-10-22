@@ -6,7 +6,6 @@ export class Vector {
     }
 
     add(vector) {
-        if (this.y >= 500) return; // remove this after map set
         this.x += vector.x;
         this.y += vector.y;
     }

@@ -11,8 +11,6 @@ class Hand extends BodyPart{
         this.dimensions = this.sprite.getDim(this.spriteName);
         this.hasEquippedGun = false;
         this.equippedGun = null;
-
-        this.position = {}
     }
 
     getWidth() { //Override
@@ -35,10 +33,11 @@ class Hand extends BodyPart{
         this.hasEquippedGun = false;
     }
 
-    draw(context, x, y) {
+    draw(context) {
+        console.log();
         this.sprite.rotate(this.spriteName,
-             context, x, y, this.scale,
-              Math.atan((this.mouse.y - this.position.y) / (this.mouse.x - this.position.x)),
+             context, this.lPosition.x, this.lPosition.y, this.scale,
+              Math.atan((this.mouse.y - this.gPosition.y) / (this.mouse.x - this.gPosition.x)),
               {x : 0, y : 1});
     }
 

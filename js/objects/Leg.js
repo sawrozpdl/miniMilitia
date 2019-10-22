@@ -9,9 +9,9 @@ class Leg extends BodyPart {
         this.isLeft = isLeft;
     }
 
-    rotate(context, x, y, angle) {
+    rotate(context, angle) {
         this.sprite.rotate(this.spriteName,
-             context, x, y, this.scale,
+             context, this.lPosition.x, this.lPosition.y, this.scale,
               angle,
               {x : 1, y : 0});
     }

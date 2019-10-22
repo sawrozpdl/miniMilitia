@@ -4,7 +4,7 @@ class BodyPart {
         this.sprite = entity.sprite;
         this.spriteName = undefined;
         this.scale = entity.scale;
-
+        this.entity = entity;
         this.dimensions = undefined;
         this.lPosition = {x : 0, y : 0}
         this.gPosition = {x : 0, y : 0}

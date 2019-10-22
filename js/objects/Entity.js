@@ -21,7 +21,9 @@ class Entity {
         this.dhealth = 0.5;
         this.isFacingRight = true;
         this.isWalking = false;
+        this.isFlying = false;
         this.velocity = new Vector(0, 0);
+        this.gravity = new Vector(0, 0.3);
         this.parts = {
             head : new Head(this),
             lHand : new Hand(this, true),
@@ -71,37 +73,54 @@ class Entity {
     moveRight() {
         this.isWalking = true;
         this.isFacingRight = true;
-        this.velocity.x = +2;
+        this.velocity.x = 2;
     }
 
-    stop() {
+    stopWalking() {
         this.isWalking = false;
         this.velocity.x = 0;
     }
 
+    flyUp() {
+        this.isFlying = true;
+        this.velocity.y = -6;
+    }
+
+    stopFlying() {
+        this.isFlying = false;
+        this.velocity.y = 0;
+    }
+
     draw() {
         let buffer = document.createElement('canvas');
-        buffer.height = this.height * this.scale;
-        buffer.width = this.width * this.scale;
+        buffer.height = this.height * this.scale * 1.5;
+        buffer.width = this.width * this.scale * 1.5;
         var bufferCtx = buffer.getContext('2d');
-        // buffer.fillstyle = 'green';
-        // bufferCtx.fillRect(0,0,buffer.width, buffer.height);
+        buffer.fillstyle = 'green';
+        bufferCtx.fillRect(0,0,buffer.width, buffer.height);
 
         this.parts.head.lPosition = {x : 0, y : 0}
         this.parts.body.lPosition = {x : 10 * this.scale, y : (this.parts.head.getHeight() - 10) * this.scale};
         this.parts.lLeg.lPosition = {x : 17 * this.scale, y : this.parts.body.lPosition.y + (this.parts.body.getHeight() - 15) * this.scale}
         this.parts.rLeg.lPosition = {x : (this.parts.body.getWidth() * this.scale + 5 * this.scale) / 2, y : this.parts.lLeg.lPosition.y}
-        this.parts.lHand.lPosition = {x : this.scale * 15, y: this.parts.body.lPosition.y + 10 * this.scale}
+        this.parts.lHand.lPosition = {x : this.scale * 17, y: this.parts.body.lPosition.y + 12 * this.scale}
         this.parts.rHand.lPosition = {x : this.parts.rLeg.lPosition.x + this.scale * 10, y : this.parts.lHand.lPosition.y}
         
         var angle = 0;
         var angularSpeed = 1;
+        var rotation = 0;
+        var rotationSpeed = 1;
+        var maxRotation = 45;
         this.audios.walk.playbackRate = 0.5;
+        this.audios.jet.volume = 0.2;
         this.audios.walk.volume = 0.5;
         return (context) => {
-            if (!this.isWalking) angle = 0;
+            if (this.isFlying) this.audios.jet.play();
+    
+            if (!this.isWalking && !this.isFlying) angle = 0;
+            if (this.isWalking && !this.isFlying) angle = 0;
             else this.audios.walk.play();
-            console.log(angularSpeed);
+
             bufferCtx.clearRect(0, 0, buffer.width, buffer.height);
 
             this.parts.rHand.draw(bufferCtx);
@@ -121,13 +140,33 @@ class Entity {
                 bPart.gPosition.x = this.position.x + bPart.lPosition.x;
                 bPart.gPosition.y = this.position.y + bPart.lPosition.y;
             }
+            
+
+            if (!this.isFlying && this.position.y <= 499) this.velocity.add(this.gravity);
 
             this.position.add(this.velocity);
-            context.drawImage(buffer, this.position.x, this.position.y);
+
+            if (this.isFlying) {
+                if (this.velocity.x > 0) rotationSpeed = 1;
+                if (this.velocity.x < 0) rotationSpeed = -1;
+                if (rotation > maxRotation) rotation = maxRotation;
+                if (rotation < -maxRotation) rotation = -maxRotation;
+            }
+            if (!this.isFlying) {  // go back smoothly
+                if (rotation < 0) rotationSpeed = 1;
+                if (rotation > 0) rotationSpeed = -1;
+                if (rotation == 0) rotationSpeed = 0;
+            }
+            rotation += rotationSpeed;
+
+            console.log(rotation);
+            this.sprite.rotate(buffer, context,
+                this.position.x, this.position.y,
+                1, rotation * (Math.PI / 180), {x : 1, y : 1});
         }
 
     }
-    
+
 }
 
 export default Entity;

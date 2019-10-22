@@ -41,15 +41,11 @@ class Main {
         };
         this.setDimensions();
         this.player = new Player(this.sprite, {
-            head : "korean-head",
-            body : "korean-body",
-            hand : "korean-hand",
-            leg : "korean-leg"
+            head : "bot-head",
+            body : "bot-body",
+            hand : "bot-hand",
+            leg : "bot-leg"
         },this.playerPosition, this.mouse, 0.7, this.audios);
-        this.gravity = {
-            x : 0,
-            y : 5 * this.speedFactor
-        }
     }
 
     setDimensions() {
@@ -136,13 +132,19 @@ class Main {
         this.keyListener.for(68, (down) => {
             this.player.moveRight();
         }, (up) => {
-            this.player.stop();
+            this.player.stopWalking();
         });
 
         this.keyListener.for(65, (down) => {
             this.player.moveLeft();
         }, (up) => {
-            this.player.stop();
+            this.player.stopWalking();
+        });
+
+        this.keyListener.for(87, (down) => {
+            this.player.flyUp();
+        }, (up) => {
+            this.player.stopFlying();
         });
 
         this.MouseListener.for('mousemove', (e) => {

@@ -4,18 +4,12 @@ class Hand extends BodyPart{
 
     constructor(entity, isLeft) {
         super(entity);
-        this.entity = entity;
         this.mouse = entity.mouse;
         this.isLeft = isLeft;
         this.spriteName = entity.spriteData.hand;
         this.dimensions = this.sprite.getDim(this.spriteName);
         this.hasEquippedGun = false;
         this.equippedGun = null;
-    }
-
-    getWidth() { //Override
-        //return this.dimensions.width + ((this.hasEquippedGun) ? this.equippedGun.width : 0);
-        return this.dimensions.width;
     }
 
     punch() {

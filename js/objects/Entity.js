@@ -112,7 +112,7 @@ class Entity {
         var rotation = 0;
         var rotationSpeed = 1;
         var maxRotation = 45;
-        this.audios.walk.playbackRate = 0.2;
+        this.audios.walk.playbackRate = 0.5;
         this.audios.jet.volume = 0.6;
         this.audios.walk.volume = 0.5;
 

@@ -81,12 +81,10 @@ class Map {
         return (context) => {
             context.drawImage(this.buffer, 0, 0);
         }
-
     }
 
     drawForeground() {
         this.foreground.forEach(gid => {
-            if (this.c == 108) console.log(gid);
             this.tile = this.getImageCoord(gid - 1);
             this.loc = this.getTileCoord(this.c);
             this.bufferCtx.drawImage(this.tileSheet, this.tile[0], this.tile[1], this.tileWidth, this.tileHeight,

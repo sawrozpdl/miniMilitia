@@ -2,7 +2,7 @@ class Camera {
 
     constructor(game) {
         this.game = game;
-        this.scope = 10;
+        this.scope = 2 * 0.3;
         this.visible = document.createElement('canvas');
         this.visibleCtx = this.visible.getContext('2d');
         this.width = this.game.GAME_WIDTH;
@@ -31,26 +31,28 @@ class Camera {
     update() {
         this.generateBackground(this.game.images.background);
         return (context) => {
+            var width = this.width * this.scope; // scoped width
+            var height = this.height * this.scope; // scoped height
+            if (this.game.player.isFacingRight) this.horizontalViewPoint = width / 4;
+            else this.horizontalViewPoint = - width / 4;
+            this.verticalViewpoint = this.game.player.parts.lHand.angle * height / 10;
             
-            if (this.game.player.isFacingRight) this.horizontalViewPoint = this.width / 4;
-            else this.horizontalViewPoint = - this.width / 4;
-            this.verticalViewpoint = this.game.player.parts.lHand.angle * this.height / 10;
-            
-            if (this.game.player.position.x > this.width / 2) 
-                this.xx = this.game.player.position.x - this.width / 2 + this.horizontalViewPoint;
-            if (this.game.player.position.y > this.height / 2) 
-                this.yy = this.game.player.position.y - this.height / 2 + this.verticalViewpoint;
+            if (this.game.player.position.x > width / 2) 
+                this.xx = this.game.player.position.x - width / 2 + this.horizontalViewPoint;
+            if (this.game.player.position.y > height / 2) 
+                this.yy = this.game.player.position.y - height / 2 + this.verticalViewpoint;
            
             this.dx = (this.xx - this.x) / 100;
             this.dy = (this.yy - this.y) / 100;    
             this.x += this.dx;
             this.y += this.dy;
 
+
             this.visibleCtx.drawImage(this.background,0,0, this.width, this.height);
             this.visibleCtx.drawImage(
                 this.game.mainBuffer,
-                this.x / (this.scope / 10), this.y / (this.scope / 10),
-                this.width / (this.scope / 10), this.height / (this.scope / 10),
+                this.x , this.y,
+                width, height,
                 0, 0, this.width, this.height
             );
             context.clearRect(0, 0, this.game.mainBuffer.width, this.game.mainBuffer.height);
@@ -58,8 +60,8 @@ class Camera {
         }
     }
 
-    setScope(scope) { // 2x, 4x, 6x (max)
-        this.scope = scope;
+    setScope(scopeRatio) { // 2x, 4x, 6x (max)
+        this.scope = scopeRatio * 0.3;
     }
 }
 

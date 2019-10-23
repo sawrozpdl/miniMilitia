@@ -47,7 +47,7 @@ class Main {
     }
 
     spawnPlayer() {
-        this.player.position = new Vector(this.GAME_WIDTH * 0.06, this.GAME_HEIGHT * 0.6);
+        this.player.position = new Vector(this.GAME_WIDTH * 0.8, this.GAME_HEIGHT * 0.2);
         this.player.spawn();
         this.camera = new Camera(this);
         this.layers.push(this.player.draw());
@@ -61,7 +61,6 @@ class Main {
             loadImage('/assets/images/loading.png'),
             loadImage('/assets/images/logo.png')
         ]).then(([background,loading, logo]) => {
-            console.log("here");
             var i = 0;
             this.layers.push((context) => {
                 context.drawImage(background, 0, 0,
@@ -154,15 +153,11 @@ class Main {
         });
 
         this.keyListener.for(50, (down) => {
-            this.camera.setScope(4);
+            this.camera.setScope(3);
         });
 
         this.keyListener.for(51, (down) => {
-            this.camera.setScope(6);
-        });
-
-        this.keyListener.for(52, (down) => {
-            this.camera.setScope(8);
+            this.camera.setScope(4);
         });
 
         this.MouseListener.for('mousemove', (e) => {

@@ -86,12 +86,12 @@ class Entity {
 
     moveLeft() {
         this.isWalking = true;
-        this.velocity.x = -2 + ((this.isFlying) ? -4 : 0);
+        this.velocity.x = -2;
     }
 
     moveRight() {
         this.isWalking = true;
-        this.velocity.x = 2 + ((this.isFlying) ? 4 : 0);
+        this.velocity.x = 2;
     }
 
     stopWalking() {
@@ -101,7 +101,7 @@ class Entity {
 
     flyUp() {
         this.isFlying = true;
-        this.velocity.y = (!this.isWalking) ? -4 : 0;
+        this.velocity.y = -4; //fix this
     }
 
     stopFlying() {

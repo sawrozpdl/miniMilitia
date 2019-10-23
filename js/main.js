@@ -16,15 +16,17 @@ import {
 
 class Main {
 
-    constructor(canvas, width, height) {
+    constructor(canvas) {
         this.canvas = canvas;
-        this.GAME_WIDTH = window.screen.width;
-        this.GAME_HEIGHT = window.screen.height;
+        this.GAME_WIDTH = 1366;
+        this.GAME_HEIGHT = 768;
+        console.log(this.canvas.parentNode.clientWidth, this.canvas.parentNode.clientWidth);
         this.FRAME_LIMIT = 60;
         this.speedFactor = 60 / this.FRAME_LIMIT;
         this.context = this.canvas.getContext('2d');
         this.layers = new Layers(this.context);
         this.animation = new Animator(this.FRAME_LIMIT);
+        this.camera = new Camera(this);
     }
 
     init() {
@@ -34,28 +36,13 @@ class Main {
             x: 0,
             y: 0
         };
-        this.setDimensions();
         this.player = new Player(this.sprite, 'indian',
-                this.playerPosition, this.mouse, 0.6, this.audios);
+                this.playerPosition, this.mouse, 0.3, this.audios);
     }
-
-
 
     setDimensions() { // REMOVE
         this.canvas.width = this.GAME_WIDTH;
         this.canvas.height = this.GAME_HEIGHT;
-    }
-
-    generateBackground(image) { // stores the backgroud in buffer and passes to layers to draw
-        let buffer = document.createElement('canvas');
-        buffer.height = this.GAME_HEIGHT;
-        buffer.width = this.GAME_WIDTH;
-        console.log(buffer.width,buffer.height);
-        buffer.getContext('2d').drawImage(image, 0, 0, this.GAME_WIDTH, this.GAME_HEIGHT);
-
-        return (context) => {
-            context.drawImage(buffer, 0, 0);
-        }
     }
 
     spawnPlayer() {
@@ -106,12 +93,13 @@ class Main {
         ]).then(([media, spriteMap, mapData]) => {
             this.images = media.images;
             this.audios = media.audios;
-            this.background = this.images.background;
             this.sprite = new Sprite(this.images.spritesheet);
-            this.map = new Map(mapData);
+            this.map = new Map(mapData, this.camera);
             this.map.init();
+            console.log(this.canvas.parentNode.clientWidth, this.canvas.parentNode.clientWidth);
             this.canvas.height = this.map.getHeight();
             this.canvas.width = this.map.getWidth();
+            console.log(this.canvas.parentNode.clientWidth, this.canvas.parentNode.clientWidth);
             this.sprite.setMap(spriteMap);
             this.dumpRecentScreen(); // which is loading screen
             this.animation.setFrameLimit(this.FRAME_LIMIT);
@@ -125,10 +113,6 @@ class Main {
             this.layers.draw();
         };
         this.animation.animate();
-    }
-
-    setBackground() {
-        this.layers.push(this.generateBackground(this.background)); 
     }
 
     setEventListeners() {
@@ -175,10 +159,13 @@ class Main {
     }
 
     launch() {
-        this.setBackground();
-        this.spawnPlayer();
-        this.setEventListeners();
-
+        this.map.ready().then(() => {
+            this.setEventListeners();
+            this.layers.push(this.map.drawBackground());
+            this.layers.push(this.map.drawForeground());
+            this.spawnPlayer();
+            this.layers.push(this.camera.update());
+        });
         window.Player = this.player;
     }
 }

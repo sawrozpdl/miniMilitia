@@ -15,9 +15,9 @@ class Leg extends BodyPart {
               angle,
               {x : 1, y : 0});
 
-        if (this.entity.isFlying) {
+        if (this.entity.isFlying && (Math.random() < 0.95)) {
             this.sprite.rotate('fire',
-                context, this.lPosition.x, this.lPosition.y + this.getHeight() * 0.6, this.scale,
+                context, this.lPosition.x, this.lPosition.y + this.getHeight() * this.scale, this.scale,
                  angle,
                  {x : 1, y : 0}); 
         }

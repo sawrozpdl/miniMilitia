@@ -3,7 +3,13 @@
               "url": "/assets/images/tiles.png",
               "width": 992,
               "height": 992,
-              "margin": 2
+              "margin": 2,
+              "tileHeight" : 64,
+              "tileWidth" : 64,
+              "tileCount" : {
+              	"x" : 15,
+              	"y" : 15
+              }
        },
        "map": {
               "width": 52,

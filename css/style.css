@@ -9,8 +9,11 @@ body {
 }
 
 .main-wrapper {
-  height : 100%;
-  width : 100%;
+    margin : 40px auto 40px auto;
+    border: 1px solid red;
+    /* overflow  : hidden; */
+    width: 1366px;
+    height : 768px;
 }
 
 #game-container {

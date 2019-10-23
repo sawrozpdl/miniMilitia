@@ -11,10 +11,7 @@ class Player extends Entity {
     
 
     punch() {
-        if (this.isTurningLeft)
-            this.lHand.punch();
-        else 
-            this.rHand.punch();
+        this.lHand.punch();
     }
 
     pickWeapn() {

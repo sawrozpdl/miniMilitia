@@ -9,6 +9,15 @@ class Camera {
         this.height = this.game.GAME_HEIGHT;
         this.visible.width = this.width;
         this.visible.height = this.height;
+
+        this.x = this.game.player.position.x - this.width / 2; // x cord
+        this.y = this.game.player.position.y - this.height / 2; // y cord
+        this.dx = 3; // change in x cord
+        this.dy = 3; // change in y cord
+        this.xx = 0; // final x cord
+        this.yy = 0; // final y cord
+        this.horizontalViewPoint = 0;
+        this.verticalViewpoint = 0;
     }
 
     generateBackground(image) { // stores the backgroud in buffer and passes to layers to draw
@@ -22,18 +31,25 @@ class Camera {
     update() {
         this.generateBackground(this.game.images.background);
         return (context) => {
-            var x = 0;
-            var y = 0;
-            if (this.game.player.position.x > this.width / (this.scope / 5)) {
-                x = this.game.player.position.x - this.width / (this.scope / 5);
-            }
-            if (this.game.player.position.y > this.height / (this.scope / 5)) {
-                y = this.game.player.position.y - this.height / (this.scope / 5);
-            }
+            
+            if (this.game.player.isFacingRight) this.horizontalViewPoint = this.width / 4;
+            else this.horizontalViewPoint = - this.width / 4;
+            this.verticalViewpoint = this.game.player.parts.lHand.angle * this.height / 10;
+            
+            if (this.game.player.position.x > this.width / 2) 
+                this.xx = this.game.player.position.x - this.width / 2 + this.horizontalViewPoint;
+            if (this.game.player.position.y > this.height / 2) 
+                this.yy = this.game.player.position.y - this.height / 2 + this.verticalViewpoint;
+           
+            this.dx = (this.xx - this.x) / 100;
+            this.dy = (this.yy - this.y) / 100;    
+            this.x += this.dx;
+            this.y += this.dy;
+
             this.visibleCtx.drawImage(this.background,0,0, this.width, this.height);
             this.visibleCtx.drawImage(
-            this.game.mainBuffer,
-                x / (this.scope / 10), y / (this.scope / 10),
+                this.game.mainBuffer,
+                this.x / (this.scope / 10), this.y / (this.scope / 10),
                 this.width / (this.scope / 10), this.height / (this.scope / 10),
                 0, 0, this.width, this.height
             );
@@ -43,7 +59,7 @@ class Camera {
     }
 
     setScope(scope) { // 2x, 4x, 6x (max)
-        this.scope = (scope + 10);
+        this.scope = scope;
     }
 }
 

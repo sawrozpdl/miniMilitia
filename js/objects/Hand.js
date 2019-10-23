@@ -34,9 +34,9 @@ class Hand extends BodyPart{
         this.hasEquippedGun = false;
     }
 
-    draw(context) {
-        this.angle = Math.atan((this.mouse.y - this.gPosition.y) /
-                               (this.mouse.x - this.gPosition.x));
+    draw(context) { //OPT
+        this.angle = Math.atan((this.mouse.y - (this.gPosition.y + this.dimensions.height * this.scale / 2)) /
+                               (this.mouse.x - (this.gPosition.x + this.dimensions.width * this.scale / 2)));
         if (!this.entity.isFacingRight) {
             this.angle *= -1;
         }

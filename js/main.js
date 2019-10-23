@@ -28,7 +28,6 @@ class Main {
         this.context = this.mainBuffer.getContext('2d');
         this.layers = new Layers(this.context);
         this.animation = new Animator(this.FRAME_LIMIT);
-        this.camera = new Camera(this);
     }
 
     init() {
@@ -50,6 +49,7 @@ class Main {
     spawnPlayer() {
         this.player.position = new Vector(this.GAME_WIDTH * 0.06, this.GAME_HEIGHT * 0.6);
         this.player.spawn();
+        this.camera = new Camera(this);
         this.layers.push(this.player.draw());
     }
 
@@ -150,19 +150,19 @@ class Main {
         });
 
         this.keyListener.for(49, (down) => {
-            this.camera.setScope(3);
-        });
-
-        this.keyListener.for(50, (down) => {
             this.camera.setScope(2);
         });
 
+        this.keyListener.for(50, (down) => {
+            this.camera.setScope(4);
+        });
+
         this.keyListener.for(51, (down) => {
-            this.camera.setScope(1);
+            this.camera.setScope(6);
         });
 
         this.keyListener.for(52, (down) => {
-            this.camera.setScope(0);
+            this.camera.setScope(8);
         });
 
         this.MouseListener.for('mousemove', (e) => {

@@ -172,8 +172,6 @@ class Entity {
             }
 
             this.rotation += this.rotationSpeed;
-
-            if (this.isFlying && this.velocity.y == 0 && !this.isWalking) this.rotation = 0;
     
             if (!this.isFacingRight) {
                 this.sprite.flip(buffer);

@@ -43,7 +43,7 @@ class Gun {
 
     draw(context) {
         this.hand.sprite.rotate(this.spriteName, context,
-            this.hand.lPosition.x + this.width * 0.35 * this.scale,
+            this.hand.lPosition.x + this.width * 0.5 * this.scale,
             this.hand.lPosition.y - this.height * 0.4 * this.scale,
             this.scale, this.hand.angle, {
                 x: 0,

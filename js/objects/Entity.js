@@ -11,11 +11,22 @@ class Entity {
         this.sprite = sprite;
         this.spriteData = spriteData;
         this.mouse = mouse;
+        this.position = position;
         this.scale = scale;
         this.audios = audios;
         this.isLimited = false; // timespan infinite if not killed
+        this.parts = {
+            head : new Head(this),
+            lHand : new Hand(this, true),
+            rHand : new Hand(this, false),
+            body : new Body(this),
+            lLeg : new Leg(this, true),
+            rLeg : new Leg(this, false)
+        }
+    }
+
+    spawn() {
         this.isKilled = false;
-        this.position = position;
         this.thruster = 100;
         this.health = 100;
         this.dthruster = 1;
@@ -25,21 +36,29 @@ class Entity {
         this.isFlying = false;
         this.velocity = new Vector(0, 0);
         this.gravity = new Vector(0, 0.3);
-        this.parts = {
-            head : new Head(this),
-            lHand : new Hand(this, true),
-            rHand : new Hand(this, false),
-            body : new Body(this),
-            lLeg : new Leg(this, true),
-            rLeg : new Leg(this, false)
-        }
         
-
         this.height = (this.parts.head.getHeight() + 
                       this.parts.body.getHeight() +
                       this.parts.lLeg.getHeight()) * 0.93; //parts are intersected
+
+        this.parts.lHand.equip(new Gun(this.parts.lHand, (Math.random() < 0.5) ? 'pistol' : 'uzi')); // spawn player with a gun at first
+        this.parts.rHand.equip(new Gun(this.parts.rHand, (Math.random() < 0.5) ? 'pistol' : 'uzi')); // REMOVE
+        
         this.width = this.parts.body.getWidth() + this.parts.lHand.getWidth() / (3 / 2); //hands are intersected
+        this.setConfigs();
     }
+
+    setConfigs() {
+        this.angle = 0;
+        this.angularSpeed = 1;
+        this.rotation = 0;
+        this.rotationSpeed = 1;
+        this.maxRotation = 60;
+        this.audios.walk.playbackRate = 0.5;
+        this.audios.jet.volume = 0.6;
+        this.audios.walk.volume = 0.5;
+    }
+
 
     thruster() {
         return this.thruster;
@@ -67,14 +86,12 @@ class Entity {
 
     moveLeft() {
         this.isWalking = true;
-        this.isFacingRight = false;
-        this.velocity.x = -2;
+        this.velocity.x = -2 + ((this.isFlying) ? -4 : 0);
     }
 
     moveRight() {
         this.isWalking = true;
-        this.isFacingRight = true;
-        this.velocity.x = 2;
+        this.velocity.x = 2 + ((this.isFlying) ? 4 : 0);
     }
 
     stopWalking() {
@@ -84,7 +101,7 @@ class Entity {
 
     flyUp() {
         this.isFlying = true;
-        this.velocity.y = -6;
+        this.velocity.y = (!this.isWalking) ? -4 : 0;
     }
 
     stopFlying() {
@@ -92,13 +109,15 @@ class Entity {
         this.velocity.y = 0;
     }
 
+    
+
     draw() {
         let buffer = document.createElement('canvas');
         buffer.height = this.height * this.scale * 1.5;
         buffer.width = this.width * this.scale * 1.5;
         var bufferCtx = buffer.getContext('2d');
-        buffer.fillstyle = 'green';
-        bufferCtx.fillRect(0,0,buffer.width, buffer.height);
+        buffer.fillstyle = 'green'; //  REMOVE
+        bufferCtx.fillRect(0,0,buffer.width, buffer.height); // REMOVE
 
         this.parts.head.lPosition = {x : 0, y : 0}
         this.parts.body.lPosition = {x : 10 * this.scale, y : (this.parts.head.getHeight() - 10) * this.scale};
@@ -106,32 +125,25 @@ class Entity {
         this.parts.rLeg.lPosition = {x : (this.parts.body.getWidth() * this.scale + 5 * this.scale) / 2, y : this.parts.lLeg.lPosition.y}
         this.parts.lHand.lPosition = {x : this.scale * 17, y: this.parts.body.lPosition.y + 12 * this.scale}
         this.parts.rHand.lPosition = {x : this.parts.rLeg.lPosition.x + this.scale * 10, y : this.parts.lHand.lPosition.y}
-        
-        var angle = 0;
-        var angularSpeed = 1;
-        var rotation = 0;
-        var rotationSpeed = 1;
-        var maxRotation = 45;
-        this.audios.walk.playbackRate = 0.5;
-        this.audios.jet.volume = 0.6;
-        this.audios.walk.volume = 0.5;
 
-        this.parts.lHand.equip(new Gun(this.parts.lHand, 'uzi')); // spawn player with a gun at first
-        this.parts.rHand.equip(new Gun(this.parts.rHand, 'uzi'));
+
+        
         return (context) => {
+            this.isFacingRight = this.position.x <= this.mouse.x;
             if (this.isFlying) this.audios.jet.play();
-            if (!this.isWalking && !this.isFlying) angle = 0;
+            if (!this.isWalking && !this.isFlying) this.angle = 0;
             else this.audios.walk.play();
 
+            
             bufferCtx.clearRect(0, 0, buffer.width, buffer.height);
 
             this.parts.rHand.draw(bufferCtx);
-            this.parts.rLeg.rotate(bufferCtx, angle * (Math.PI / 180));
-            this.parts.lLeg.rotate(bufferCtx, -1 * angle* (Math.PI / 180));
+            this.parts.rLeg.rotate(bufferCtx, this.angle * (Math.PI / 180));
+            this.parts.lLeg.rotate(bufferCtx, -1 * this.angle* (Math.PI / 180));
 
-            angle += angularSpeed;
-            if (angle > 10 || angle < -10) 
-                angularSpeed *= -1;
+            this.angle += this.angularSpeed;
+            if (this.angle > 10 || this.angle < -10) 
+                this.angularSpeed *= -1;
             
             this.parts.body.draw(bufferCtx);
             this.parts.head.draw(bufferCtx);
@@ -148,21 +160,28 @@ class Entity {
             this.position.add(this.velocity);
 
             if (this.isFlying) {
-                if (this.velocity.x > 0) rotationSpeed = 1;
-                if (this.velocity.x < 0) rotationSpeed = -1;
-                if (rotation > maxRotation) rotation = maxRotation;
-                if (rotation < -maxRotation) rotation = -maxRotation;
+                if (this.velocity.x > 0) this.rotationSpeed = 1;
+                if (this.velocity.x < 0) this.rotationSpeed = -1;
+                if (this.rotation > this.maxRotation) this.rotation = this.maxRotation;
+                if (this.rotation < -this.maxRotation) this.rotation = -this.maxRotation;
             }
             if (!this.isFlying) {  // go back smoothly
-                if (rotation < 0) rotationSpeed = 1;
-                if (rotation > 0) rotationSpeed = -1;
-                if (rotation == 0) rotationSpeed = 0;
+                if (this.rotation < 0) this.rotationSpeed = 1;
+                if (this.rotation > 0) this.rotationSpeed = -1;
+                if (this.rotation == 0) this.rotationSpeed = 0;
             }
-            rotation += rotationSpeed;
 
+            this.rotation += this.rotationSpeed;
+
+            if (this.isFlying && this.velocity.y == 0 && !this.isWalking) this.rotation = 0;
+    
+            if (!this.isFacingRight) {
+                this.sprite.flip(buffer);
+            }
             this.sprite.rotate(buffer, context,
                 this.position.x, this.position.y,
-                1, rotation * (Math.PI / 180), {x : 1, y : 1});
+                1, this.rotation * (Math.PI / 180), {x : 1, y : 1});
+
         }
 
     }

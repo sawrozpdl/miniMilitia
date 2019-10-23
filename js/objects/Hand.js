@@ -6,16 +6,21 @@ class Hand extends BodyPart{
         super(entity);
         this.mouse = entity.mouse;
         this.isLeft = isLeft;
-        this.spriteName = entity.spriteData.hand;
+        this.spriteName = entity.spriteData + '-hand';
         this.dimensions = this.sprite.getDim(this.spriteName);
         this.hasEquippedGun = false;
         this.equippedGun = null;
 
         this.angle = 0;
+        this.maxRotation = 60 * (Math.PI / 180);
     }
 
     punch() {
 
+    }
+
+    getWidth() {
+        return this.dimensions.width + (this.hasEquippedGun) ? this.equippedGun.width * 0.5 : 0;
     }
 
     equip(gun) {
@@ -30,8 +35,11 @@ class Hand extends BodyPart{
     }
 
     draw(context) {
-        console.log();
-        this.angle = Math.atan((this.mouse.y - this.gPosition.y) / (this.mouse.x - this.gPosition.x));
+        this.angle = Math.atan((this.mouse.y - this.gPosition.y) /
+                               (this.mouse.x - this.gPosition.x));
+        if (!this.entity.isFacingRight) {
+            this.angle *= -1;
+        }
         if (this.hasEquippedGun) this.equippedGun.draw(context);
         this.sprite.rotate(this.spriteName,
              context, this.lPosition.x, this.lPosition.y,

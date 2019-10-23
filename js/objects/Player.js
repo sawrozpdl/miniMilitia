@@ -17,6 +17,18 @@ class Player extends Entity {
             this.rHand.punch();
     }
 
+    pickWeapn() {
+
+    }
+
+    switchWeapon() {
+
+    }
+
+    dropWeapon() {
+        
+    }
+
     
 }
 

@@ -3,6 +3,9 @@ class Sprite {
     constructor(image) {
         this.image = image;
         this.objects = new Map();
+
+        this.tempBuffer = document.createElement('canvas');
+        this.tempCtx = this.tempBuffer.getContext('2d');
     }
 
     set(name, x, y, width, height) {
@@ -17,7 +20,10 @@ class Sprite {
 
     getDim(name) {
         var temp = this.objects.get(name);
-        return {width : temp.width, height : temp.height};
+        return {
+            width: temp.width,
+            height: temp.height
+        };
     }
 
     setMap(json) {
@@ -36,7 +42,8 @@ class Sprite {
     }
 
     rotate(element, context, x, y, scale, angle, orientation) {
-        let buffer = (element instanceof HTMLCanvasElement) ? element : this.objects.get(element);
+        let buffer = (element instanceof HTMLCanvasElement) ?
+            element : this.objects.get(element);
         var coord = { // 0,0 for lefttop, 0,1 for leftcenter, 0,2 for leftbottom ...
             x: orientation.x * (buffer.width / 2) * scale,
             y: orientation.y * (buffer.height / 2) * scale
@@ -50,16 +57,17 @@ class Sprite {
         context.restore();
     }
 
-    flip(name, context) {
-        let buffer = this.objects.get(name);
-        var posX = buffer.width * -1;
-        var posY =  0; 
-        context.save();
-        context.scale(-1, 1);  // horizontal flip 1, -1 for verical one
-        context.drawImage(buffer, posX, posY, buffer.width, buffer.height);
-        context.restore();
+    flip(element) {
+        this.tempBuffer.width = element.width;
+        this.tempBuffer.height = element.height;
+        this.tempCtx.scale(-1, 1); // horizontal flip 1, -1 for verical one
+        this.tempCtx.drawImage(element,
+            element.width * -1, 0,
+            element.width, element.height);
+        element.getContext('2d').clearRect(0, 0, element.width, element.height);
+        element.getContext('2d').drawImage(this.tempBuffer, 0, 0);
     };
-    
+
 }
 
 export default Sprite;

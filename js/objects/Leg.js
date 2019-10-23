@@ -4,7 +4,7 @@ class Leg extends BodyPart {
 
     constructor(entity, isLeft) {
         super(entity);
-        this.spriteName = entity.spriteData.leg;
+        this.spriteName = entity.spriteData + '-leg';
         this.dimensions = this.sprite.getDim(this.spriteName);
         this.isLeft = isLeft;
     }
@@ -17,7 +17,7 @@ class Leg extends BodyPart {
 
         if (this.entity.isFlying) {
             this.sprite.rotate('fire',
-                context, this.lPosition.x, this.lPosition.y + this.getHeight() * 0.7, this.scale,
+                context, this.lPosition.x, this.lPosition.y + this.getHeight() * 0.6, this.scale,
                  angle,
                  {x : 1, y : 0}); 
         }

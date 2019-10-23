@@ -2,16 +2,13 @@ class Camera {
 
     constructor(game) {
         this.game = game;
-        this.player = this.game.player;
-
+        this.scope = 10;
         this.visible = document.createElement('canvas');
         this.visibleCtx = this.visible.getContext('2d');
         this.width = this.game.GAME_WIDTH;
         this.height = this.game.GAME_HEIGHT;
-
         this.visible.width = this.width;
         this.visible.height = this.height;
-        console.log(this.width, this.height, "yoyo");
     }
 
     generateBackground(image) { // stores the backgroud in buffer and passes to layers to draw
@@ -24,25 +21,29 @@ class Camera {
 
     update() {
         this.generateBackground(this.game.images.background);
-        //return (ctx) => {}
         return (context) => {
             var x = 0;
-            var y = this.game.canvas.height - this.height;
-            this.visibleCtx.clearRect(0, 0, this.width, this.height);
+            var y = 0;
+            if (this.game.player.position.x > this.width / (this.scope / 5)) {
+                x = this.game.player.position.x - this.width / (this.scope / 5);
+            }
+            if (this.game.player.position.y > this.height / (this.scope / 5)) {
+                y = this.game.player.position.y - this.height / (this.scope / 5);
+            }
             this.visibleCtx.drawImage(this.background,0,0, this.width, this.height);
             this.visibleCtx.drawImage(
-            this.game.canvas,
-                x,y, this.width, this.height,
+            this.game.mainBuffer,
+                x / (this.scope / 10), y / (this.scope / 10),
+                this.width / (this.scope / 10), this.height / (this.scope / 10),
                 0, 0, this.width, this.height
             );
-            context.clearRect(0, 0, this.game.canvas.width, this.game.canvas.height);
-            context.drawImage(this.visible, 0, 0, this.width, this.height);
+            context.clearRect(0, 0, this.game.mainBuffer.width, this.game.mainBuffer.height);
+            this.game.mainContext.drawImage(this.visible, 0, 0, this.width, this.height);
         }
-        
     }
 
     setScope(scope) { // 2x, 4x, 6x (max)
-
+        this.scope = (scope + 10);
     }
 }
 

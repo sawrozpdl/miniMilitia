@@ -4,9 +4,8 @@ import {
 
 class Map {
 
-    constructor(mapData, camera) {
+    constructor(mapData) {
         this.mapData = mapData;
-        this.camera = camera;
     }
 
     init() {
@@ -19,9 +18,6 @@ class Map {
 
         this.background = this.mapData.map.layers.background;
         this.foreground = this.mapData.map.layers.foreground;
-
-        console.log(this.getTileGrid(52), this.getTileCoord(52));
-        console.log(this.getImageGrid(33), this.getImageCoord(33));
     }
 
     getTileGrid(gid) {

@@ -20,10 +20,12 @@ class Main {
         this.canvas = canvas;
         this.GAME_WIDTH = 1366;
         this.GAME_HEIGHT = 768;
-        console.log(this.canvas.parentNode.clientWidth, this.canvas.parentNode.clientWidth);
         this.FRAME_LIMIT = 60;
         this.speedFactor = 60 / this.FRAME_LIMIT;
-        this.context = this.canvas.getContext('2d');
+
+        this.mainContext = this.canvas.getContext('2d');
+        this.mainBuffer = document.createElement('canvas');
+        this.context = this.mainBuffer.getContext('2d');
         this.layers = new Layers(this.context);
         this.animation = new Animator(this.FRAME_LIMIT);
         this.camera = new Camera(this);
@@ -40,7 +42,7 @@ class Main {
                 this.playerPosition, this.mouse, 0.3, this.audios);
     }
 
-    setDimensions() { // REMOVE
+    setDimensions() { 
         this.canvas.width = this.GAME_WIDTH;
         this.canvas.height = this.GAME_HEIGHT;
     }
@@ -53,6 +55,7 @@ class Main {
 
     deployLoadingScreen() {
         this.setDimensions();
+        this.layers.setContext(this.mainContext);
         Promise.all([
             loadImage('/assets/images/background-main.png'),
             loadImage('/assets/images/loading.png'),
@@ -94,14 +97,13 @@ class Main {
             this.images = media.images;
             this.audios = media.audios;
             this.sprite = new Sprite(this.images.spritesheet);
-            this.map = new Map(mapData, this.camera);
+            this.map = new Map(mapData);
             this.map.init();
-            console.log(this.canvas.parentNode.clientWidth, this.canvas.parentNode.clientWidth);
-            this.canvas.height = this.map.getHeight();
-            this.canvas.width = this.map.getWidth();
-            console.log(this.canvas.parentNode.clientWidth, this.canvas.parentNode.clientWidth);
+            this.mainBuffer.height = this.map.getHeight();
+            this.mainBuffer.width = this.map.getWidth();
             this.sprite.setMap(spriteMap);
             this.dumpRecentScreen(); // which is loading screen
+            this.layers.setContext(this.context);
             this.animation.setFrameLimit(this.FRAME_LIMIT);
             this.init();
             this.launch();
@@ -147,13 +149,28 @@ class Main {
             this.player.dropWeapon();
         });
 
+        this.keyListener.for(49, (down) => {
+            this.camera.setScope(3);
+        });
+
+        this.keyListener.for(50, (down) => {
+            this.camera.setScope(2);
+        });
+
+        this.keyListener.for(51, (down) => {
+            this.camera.setScope(1);
+        });
+
+        this.keyListener.for(52, (down) => {
+            this.camera.setScope(0);
+        });
+
         this.MouseListener.for('mousemove', (e) => {
             this.mouse.x = e.clientX;
             this.mouse.y = e.clientY;
         });
 
         this.MouseListener.for('click', (e) => {
-            console.log(this.player);
             this.player.shoot();
         });
     }
@@ -164,9 +181,8 @@ class Main {
             this.layers.push(this.map.drawBackground());
             this.layers.push(this.map.drawForeground());
             this.spawnPlayer();
-            this.layers.push(this.camera.update());
+            this.layers.setCamera(this.camera.update());
         });
-        window.Player = this.player;
     }
 }
 

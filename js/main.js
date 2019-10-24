@@ -124,6 +124,7 @@ class Main {
         this.keyListener.for(68, (down) => {
             if (this.player.collisionState.right) {
                 this.player.stopWalking();
+                this.player.pushUp();
                 return;
             }
             this.player.moveRight();
@@ -134,6 +135,7 @@ class Main {
         this.keyListener.for(65, (down) => {
             if (this.player.collisionState.left) {
                 this.player.stopWalking();
+                this.player.pushUp();
                 return;
             }
             this.player.moveLeft();
@@ -143,7 +145,9 @@ class Main {
 
         this.keyListener.for(87, (down) => {
             if (this.player.collisionState.top) {
+                console.log("BOUNCE");
                 this.player.stopFlying();
+                this.player.velocity.y *= -1;
                 return;
             }
             this.player.flyUp();

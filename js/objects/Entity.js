@@ -117,6 +117,10 @@ class Entity extends Polygon {
         this.velocity.y = 0;
     }
 
+    pushUp() {
+        this.position.y -= 1;
+    }
+
     isColliding() {
         return this.collisionState.top ||
                 this.collisionState.right ||
@@ -171,12 +175,10 @@ class Entity extends Polygon {
             }
 
             if (this.collisionState.bottom) {
-                this.gravity = 0;
-                this.velocity.y = 0;
+                this.velocity.y = -this.gravity;
             }
-            else this.gravity = 0.3;
             if (this.isFlying) this.gravity = 0;
-            
+            else this.gravity = 0.3;
             this.velocity.y += this.gravity;
             this.position.add(this.velocity);
            

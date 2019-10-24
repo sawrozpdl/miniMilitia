@@ -77,14 +77,12 @@ class Collision {
                 });
                 cty2.closePath();
                 cty2.stroke();
-                if (!this.game.player.isColliding()) {
-                    this.game.player.collisionState = {
-                        "top": false,
-                        "right": false,
-                        "bottom" : false,
-                        //"bottom": this.game.player.collisionState.bottom && !this.game.player.isFlying,
-                        "left": false
-                    }
+            
+                var cstate = {
+                    "top": false,
+                    "right": false,
+                    "bottom" : false,
+                    "left": false
                 }
                 
                 this.rockPolygons.forEach(rock => {
@@ -93,17 +91,29 @@ class Collision {
                             
                             rock.getLineSegments().forEach(rline => {
                                 if (this.intersects(pline, rline)) {
-                                    this.game.player.collisionState[pline.i] = true;
+                                    cstate[pline.i] = true;
                                     console.log("Collision at ", pline.i);
                                 }
                             });
                         });
-
+                        if (cstate.left && cstate.right && cstate.bottom) {
+                                cstate.left = false;
+                                cstate.right = false;
+                        }
+                        else if (cstate.left && cstate.right && cstate.top) {
+                                cstate.left = false;
+                                cstate.right = false;
+                        }
+                        else if (cstate.left && cstate.right) {
+                            cstate.left = false;
+                            cstate.right = false;
+                        }
+                            
+                        this.game.player.collisionState = cstate;
+                        return;
                     }
                 });
-                if (this.game.player.collisionState.left &&
-                    this.game.player.collisionState.right)
-                    this.game.player.collisionState.bottom = true;
+                
             });
             ctx.drawImage(temp2, 0, 0);
             cty2.clearRect(0, 0, temp2.width, temp2.height);

@@ -4,10 +4,12 @@ import Body from "/js/objects/Body.js";
 import Leg from "/js/objects/Leg.js";
 import {Vector} from '/js/utils/Math.js';
 import Gun from "/js/objects/Gun.js";
+import Polygon from "/js/objects/Polygon.js";
 
-class Entity {
+class Entity extends Polygon {
 
     constructor(sprite, spriteData, position, mouse, scale, audios) {
+        super();
         this.sprite = sprite;
         this.spriteData = spriteData;
         this.mouse = mouse;
@@ -35,7 +37,7 @@ class Entity {
         this.isWalking = false;
         this.isFlying = false;
         this.velocity = new Vector(0, 0);
-        this.gravity = new Vector(0, 0.3);
+        this.gravity = new Vector(0, 0.1);
         
         this.height = (this.parts.head.getHeight() + 
                       this.parts.body.getHeight() +
@@ -125,9 +127,8 @@ class Entity {
         this.parts.rLeg.lPosition = {x : (this.parts.body.getWidth() * this.scale + 5 * this.scale) / 2, y : this.parts.lLeg.lPosition.y}
         this.parts.lHand.lPosition = {x : this.scale * 17, y: this.parts.body.lPosition.y + 12 * this.scale}
         this.parts.rHand.lPosition = {x : this.parts.rLeg.lPosition.x + this.scale * 10, y : this.parts.lHand.lPosition.y}
-
-
         
+
         return (context) => {
             this.isFacingRight = this.position.x <= this.mouse.x;
             if (this.isFlying) this.audios.jet.play();
@@ -135,7 +136,7 @@ class Entity {
             else this.audios.walk.play();
 
             
-            bufferCtx.clearRect(0, 0, buffer.width, buffer.height);
+            //bufferCtx.clearRect(0, 0, buffer.width, buffer.height);
 
             this.parts.rHand.draw(bufferCtx);
             this.parts.rLeg.rotate(bufferCtx, this.angle * (Math.PI / 180));

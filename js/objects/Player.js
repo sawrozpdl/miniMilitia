@@ -6,7 +6,7 @@ class Player extends Entity {
         super(sprite, spriteData, position, mouse, scale, audio);
 
         this.health = super.health * 2;
-        this.isBot = false;
+        this.isBot =  false;
     }
     
 

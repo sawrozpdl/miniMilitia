@@ -5,7 +5,6 @@ class Robot extends Entity {
     constructor(sprite, spriteData, position) {
         super(sprite, spriteData, position);
 
-        this.player = null;
         this.isBot = true;
     }
 

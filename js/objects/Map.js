@@ -1,6 +1,7 @@
 import {
     loadImage
 } from '/js/utils/Loader.js';
+import Polygon from '/js/objects/Polygon.js';
 
 class Map {
 
@@ -96,6 +97,28 @@ class Map {
             context.drawImage(this.buffer, 0, 0);
         }
     }
+
+    drawBushes() {
+
+        return (context) => {
+
+        }
+    }
+
+    setCollisionLayer(collision) {
+        this.collision = collision;
+    }
+
+    getCollisionLayer() {
+        this.mapData.map.collision.forEach(polygonObj => {
+            var polygon = new Polygon();
+            polygon.setDimensions(polygonObj);
+            this.collision.pushRock(polygon);
+        });
+        return this.collision.check();
+    }
+
+
 }
 
 export default Map;

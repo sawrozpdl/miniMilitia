@@ -5,6 +5,7 @@ class Animator {
         this.callback = undefined;
         this.timeOffset = 0;
         this.previousTime = 0;
+        
 
         // 1 / FrameLimit gives time gap between 2 frames
         this.update = (time) => {

@@ -11,9 +11,6 @@ class Head extends BodyPart{
 
     draw(context) { //OPT
         this.angle = this.entity.parts.lHand.angle / 4;
-        if (!this.entity.isFacingRight) {
-            this.angle *= -1;
-        }
         this.sprite.rotate(this.spriteName,
              context, this.lPosition.x, this.lPosition.y,
               this.scale,this.angle,

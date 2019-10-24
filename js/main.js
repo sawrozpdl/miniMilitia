@@ -5,6 +5,7 @@ import Keyboard from '/js/events/Keyboard.js';
 import Mouse from '/js/events/Mouse.js';
 import Camera from '/js/utils/Camera.js';
 import Map from '/js/objects/Map.js';
+import Collision from '/js/objects/Collision.js';
 import Player from '/js/objects/Player.js';
 import {Vector} from '/js/utils/Math.js';
 import {
@@ -39,6 +40,8 @@ class Main {
         };
         this.player = new Player(this.sprite, 'indian',
                 this.playerPosition, this.mouse, 0.3, this.audios);
+        this.collision = new Collision(this);
+        console.log(this.collision);
     }
 
     setDimensions() { 
@@ -105,6 +108,7 @@ class Main {
             this.layers.setContext(this.context);
             this.animation.setFrameLimit(this.FRAME_LIMIT);
             this.init();
+            this.map.setCollisionLayer(this.collision);
             this.launch();
         });
     }
@@ -136,11 +140,11 @@ class Main {
         });
 
         this.keyListener.for(70, (down) => {
-            console.log('Respect!');
-            this.player.pickWeapon();
+            //this.player.pickWeapon();
         });
 
         this.keyListener.for(9, (down) => {
+            this.collision.canCollide();
             this.player.switchWeapon();
         });
 
@@ -172,11 +176,13 @@ class Main {
 
     launch() {
         this.map.ready().then(() => {
-            this.setEventListeners();
             this.layers.push(this.map.drawBackground());
             this.layers.push(this.map.drawForeground());
             this.spawnPlayer();
+            this.layers.push(this.map.drawBushes());
+            this.layers.push(this.map.getCollisionLayer());
             this.layers.setCamera(this.camera.update());
+            this.setEventListeners();
         });
     }
 }

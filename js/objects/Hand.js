@@ -35,11 +35,11 @@ class Hand extends BodyPart{
     }
 
     draw(context) { //OPT
-        this.angle = Math.atan((this.mouse.y - (this.gPosition.y + this.dimensions.height * this.scale / 2)) /
-                               (this.mouse.x - (this.gPosition.x + this.dimensions.width * this.scale / 2)));
-        if (!this.entity.isFacingRight) {
-            this.angle *= -1;
-        }
+        var dy = (this.mouse.y - (this.gPosition.y));
+        var dx = (this.mouse.x - (this.gPosition.x));
+        
+        this.angle = (this.entity.isFacingRight) ? Math.atan2(dy, dx) : -Math.atan(dy / dx);
+
         if (this.hasEquippedGun) this.equippedGun.draw(context);
         this.sprite.rotate(this.spriteName,
              context, this.lPosition.x, this.lPosition.y,

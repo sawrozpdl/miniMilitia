@@ -1,4 +1,4 @@
-import Weapon from '/js/objects/Weapon.js';
+import Weapon from './Weapon.js';
 
 class Bomb extends Weapon {
 

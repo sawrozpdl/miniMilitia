@@ -1,10 +1,10 @@
-import Head from "/js/objects/Head.js";
-import Hand from "/js/objects/Hand.js";
-import Body from "/js/objects/Body.js";
-import Leg from "/js/objects/Leg.js";
-import {Vector} from '/js/utils/Math.js';
-import Gun from "/js/objects/Gun.js";
-import Polygon from "/js/objects/Polygon.js";
+import Head from "./Head.js";
+import Hand from "./Hand.js";
+import Body from "./Body.js";
+import Leg from "./Leg.js";
+import {Vector} from '../utils/Math.js';
+import Gun from "./Gun.js";
+import Polygon from "./Polygon.js";
 
 class Entity extends Polygon {
 
@@ -36,9 +36,15 @@ class Entity extends Polygon {
         this.isFacingRight = true;
         this.isWalking = false;
         this.isFlying = false;
+        this.isShifted = false;
         this.velocity = new Vector(0, 0);
-        this.gravity = new Vector(0, 0.1);
-        
+        this.gravity = 0.3;
+        this.collisionState = {
+            "top" : false,
+            "right" : false,
+            "bottom" : false,
+            "left" : false
+        }
         this.height = (this.parts.head.getHeight() + 
                       this.parts.body.getHeight() +
                       this.parts.lLeg.getHeight()) * 0.93; //parts are intersected
@@ -111,6 +117,13 @@ class Entity extends Polygon {
         this.velocity.y = 0;
     }
 
+    isColliding() {
+        return this.collisionState.top ||
+                this.collisionState.right ||
+                this.collisionState.bottom ||
+                this.collisionState.left 
+    }
+
     
 
     draw() {
@@ -128,15 +141,16 @@ class Entity extends Polygon {
         this.parts.lHand.lPosition = {x : this.scale * 17, y: this.parts.body.lPosition.y + 12 * this.scale}
         this.parts.rHand.lPosition = {x : this.parts.rLeg.lPosition.x + this.scale * 10, y : this.parts.lHand.lPosition.y}
         
+        this.updatePoints();
 
         return (context) => {
-            this.isFacingRight = this.position.x <= this.mouse.x;
+            this.isFacingRight = (this.position.x % 1366) < this.mouse.x;
             if (this.isFlying) this.audios.jet.play();
             if (!this.isWalking && !this.isFlying) this.angle = 0;
             else this.audios.walk.play();
 
             
-            //bufferCtx.clearRect(0, 0, buffer.width, buffer.height);
+            bufferCtx.clearRect(0, 0, buffer.width, buffer.height);
 
             this.parts.rHand.draw(bufferCtx);
             this.parts.rLeg.rotate(bufferCtx, this.angle * (Math.PI / 180));
@@ -155,11 +169,17 @@ class Entity extends Polygon {
                 bPart.gPosition.x = this.position.x + bPart.lPosition.x;
                 bPart.gPosition.y = this.position.y + bPart.lPosition.y;
             }
+
+            if (this.collisionState.bottom) {
+                this.gravity = 0;
+                this.velocity.y = 0;
+            }
+            else this.gravity = 0.3;
+            if (this.isFlying) this.gravity = 0;
             
-            if (!this.isFlying && this.position.y <= 499) this.velocity.add(this.gravity);
-
+            this.velocity.y += this.gravity;
             this.position.add(this.velocity);
-
+           
             if (this.isFlying) {
                 if (this.velocity.x > 0) this.rotationSpeed = 1;
                 if (this.velocity.x < 0) this.rotationSpeed = -1;
@@ -177,6 +197,15 @@ class Entity extends Polygon {
             if (!this.isFacingRight) {
                 this.sprite.flip(buffer);
             }
+            // if (!this.isFacingRight && !this.isShifted) {
+            //     this.position.x -= this.width * this.scale * 0.8;
+            //     this.isShifted = true;
+            // }
+            // if (this.isFacingRight && this.isShifted) {
+            //     this.position.x += this.width * this.scale * 0.8;
+            //     this.isShifted = false;   
+            // }
+            this.updatePoints();
             this.sprite.rotate(buffer, context,
                 this.position.x, this.position.y,
                 1, this.rotation * (Math.PI / 180), {x : 1, y : 1});

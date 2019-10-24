@@ -1,4 +1,4 @@
-import Main from '/js/Main.js';
+import Main from './Main.js';
 
 var canvas = document.getElementById('game-container');
 var game = new Main(canvas);

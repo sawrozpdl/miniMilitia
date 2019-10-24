@@ -5,7 +5,7 @@ class Mouse {
     }
 
     for(event, callback) {
-        this.object.addEventListener(event, (e) => {
+        window.addEventListener(event, (e) => {
             callback(e);
         });
     }

@@ -1,18 +1,18 @@
-import Sprite from '/js/utils/Sprite.js';
-import Animator from '/js/utils/Animator.js';
-import Layers from '/js/utils/Layers.js';
-import Keyboard from '/js/events/Keyboard.js';
-import Mouse from '/js/events/Mouse.js';
-import Camera from '/js/utils/Camera.js';
-import Map from '/js/objects/Map.js';
-import Collision from '/js/objects/Collision.js';
-import Player from '/js/objects/Player.js';
-import {Vector} from '/js/utils/Math.js';
+import Sprite from './utils/Sprite.js';
+import Animator from './utils/Animator.js';
+import Layers from './utils/Layers.js';
+import Keyboard from './events/Keyboard.js';
+import Mouse from './events/Mouse.js';
+import Camera from './utils/Camera.js';
+import Map from './objects/Map.js';
+import Collision from './objects/Collision.js';
+import Player from './objects/Player.js';
+import {Vector} from './utils/Math.js';
 import {
     loadImage,
     loadJson,
     loadMedia
-} from '/js/utils/Loader.js';
+} from './utils/Loader.js';
 
 
 class Main {
@@ -122,18 +122,30 @@ class Main {
 
     setEventListeners() {
         this.keyListener.for(68, (down) => {
+            if (this.player.collisionState.right) {
+                this.player.stopWalking();
+                return;
+            }
             this.player.moveRight();
         }, (up) => {
             this.player.stopWalking();
         });
 
         this.keyListener.for(65, (down) => {
+            if (this.player.collisionState.left) {
+                this.player.stopWalking();
+                return;
+            }
             this.player.moveLeft();
         }, (up) => {
             this.player.stopWalking();
         });
 
         this.keyListener.for(87, (down) => {
+            if (this.player.collisionState.top) {
+                this.player.stopFlying();
+                return;
+            }
             this.player.flyUp();
         }, (up) => {
             this.player.stopFlying();

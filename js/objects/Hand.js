@@ -1,4 +1,4 @@
-import BodyPart from '/js/objects/BodyPart.js';
+import BodyPart from './BodyPart.js';
 
 class Hand extends BodyPart{
 
@@ -12,7 +12,6 @@ class Hand extends BodyPart{
         this.equippedGun = null;
 
         this.angle = 0;
-        this.maxRotation = 60 * (Math.PI / 180);
     }
 
     punch() {
@@ -36,10 +35,9 @@ class Hand extends BodyPart{
 
     draw(context) { //OPT
         var dy = (this.mouse.y - (this.gPosition.y));
-        var dx = (this.mouse.x - (this.gPosition.x));
+        var dx = (this.mouse.x - (this.gPosition.x % 1366));
         
         this.angle = (this.entity.isFacingRight) ? Math.atan2(dy, dx) : -Math.atan(dy / dx);
-
         if (this.hasEquippedGun) this.equippedGun.draw(context);
         this.sprite.rotate(this.spriteName,
              context, this.lPosition.x, this.lPosition.y,

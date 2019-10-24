@@ -20,7 +20,8 @@ export function loadAudio(url) {
 export function loadJson(url) {
     return new Promise(resolve => {
         return fetch(url).then(response => {
-            resolve(response.json());
+            setTimeout(resolve, 1000, response.json());
+            //resolve(response.json());
         });
     });
 }

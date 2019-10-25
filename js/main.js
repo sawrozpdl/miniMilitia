@@ -124,7 +124,7 @@ class Main {
         this.keyListener.for(68, (down) => {
             if (this.player.collisionState.right) {
                 this.player.pushUp();
-                //this.player.stopWalking();
+                this.player.stopWalking();
                 return;
             }
             this.player.moveRight();
@@ -135,7 +135,7 @@ class Main {
         this.keyListener.for(65, (down) => {
             if (this.player.collisionState.left) {
                 this.player.pushUp();
-                //this.player.stopWalking();
+                this.player.stopWalking();
                 return;
             }
             this.player.moveLeft();

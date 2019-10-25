@@ -118,7 +118,7 @@ class Entity extends Polygon {
     }
 
     pushUp() {
-        this.position.y -= 1;
+        this.position.y -= 2;
     }
 
     isColliding() {

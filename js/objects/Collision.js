@@ -101,10 +101,15 @@ class Collision {
                         if (!cstate.left && !cstate.right && !cstate.bottom && !cstate.top)
                             this.ground = false;
                         else this.ground = cstate.ground;
-                        if ((cstate.left && cstate.right && cstate.bottom) ||
-                            (cstate.left && cstate.right && cstate.top)) {
-                                cstate.left = false;
-                                cstate.right = false;
+                        if ((cstate.left && cstate.right && (cstate.bottom || (!this.game.player.isFlying && !cstate.top)))) {
+                            // cstate.left = false;
+                            // cstate.right = false;
+                            cstate.bottom = true; 
+                        }
+                        if ((cstate.left && cstate.right && (cstate.top || (this.game.player.isFlying && !cstate.bottom)))) {
+                            // cstate.left = false;
+                            // cstate.right = false;
+                            cstate.top = true;
                         }
                         this.game.player.collisionState = cstate;
                         return;

@@ -7,6 +7,8 @@ class Collision {
         this.spans = [];
 
         this.playerPolygons.push(game.player);
+        
+        this.ground = false;
     }
 
 
@@ -58,6 +60,7 @@ class Collision {
                 cty.stroke();
             });
             cty.closePath();
+            cty.stroke();
         })
         var temp2 = document.createElement('canvas');
         temp2.width = this.game.mainBuffer.width;
@@ -81,34 +84,28 @@ class Collision {
                 var cstate = {
                     "top": false,
                     "right": false,
-                    "bottom" : false,
+                    "bottom" : this.ground,
                     "left": false
                 }
                 
                 this.rockPolygons.forEach(rock => {
-                    if (this.canCollide(player, rock)) {
-                        player.getLineSegments().forEach(pline => {
-                            
-                            rock.getLineSegments().forEach(rline => {
-                                if (this.intersects(pline, rline)) {
-                                    cstate[pline.i] = true;
-                                    console.log("Collision at ", pline.i);
-                                }
+                    if (this.canCollide(player, rock)) {     
+                        rock.getLineSegments().forEach(rline => {
+                            player.getLineSegments().forEach(pline => {
+                            if (this.intersects(pline, rline)) {
+                                cstate[pline.i] = true;
+                                console.log("Collision at ", pline.i);
+                            }
                             });
                         });
-                        if (cstate.left && cstate.right && cstate.bottom) {
+                        if (!cstate.left && !cstate.right && !cstate.bottom && !cstate.top)
+                            this.ground = false;
+                        else this.ground = cstate.ground;
+                        if ((cstate.left && cstate.right && cstate.bottom) ||
+                            (cstate.left && cstate.right && cstate.top)) {
                                 cstate.left = false;
                                 cstate.right = false;
                         }
-                        else if (cstate.left && cstate.right && cstate.top) {
-                                cstate.left = false;
-                                cstate.right = false;
-                        }
-                        else if (cstate.left && cstate.right) {
-                            cstate.left = false;
-                            cstate.right = false;
-                        }
-                            
                         this.game.player.collisionState = cstate;
                         return;
                     }

@@ -1,4 +1,4 @@
-import Entity from "/js/objects/Entity.js";
+import Entity from "./Entity.js";
 
 class Player extends Entity {
 

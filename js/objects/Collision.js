@@ -8,7 +8,9 @@ class Collision {
 
         this.playerPolygons.push(game.player);
         
-        this.ground = false;
+        this.state = [];
+
+        this.showDev = true;
     }
 
 
@@ -31,87 +33,73 @@ class Collision {
             (player.position.y + player.height * 0.6) > rock.position.y);
     }
 
-    intersects(lineA, lineB) {
-        var denominator, a, b, numerator1, numerator2;
-
-        denominator = ((lineB.y2 - lineB.y1) * (lineA.x2 - lineA.x1)) - ((lineB.x2 - lineB.x1) * (lineA.y2 - lineA.y1)); // difference in slope
-        if (denominator == 0) return false; // collinear
-
-        numerator1 = ((lineB.x2 - lineB.x1) * (lineA.y1 - lineB.y1)) - ((lineB.y2 - lineB.y1) * (lineA.x1 - lineB.x1));
-        numerator2 = ((lineA.x2 - lineA.x1) * (lineA.y1 - lineB.y1)) - ((lineA.y2 - lineA.y1) * (lineA.x1 - lineB.x1));
-
-        a = numerator1 / denominator;
-        b = numerator2 / denominator;
-
-        return (a > 0 && a < 1 && b > 0 && b < 1);
+    contains(point, vs) {
+        var x = point.x, y = point.y;
+    
+        var inside = false;
+        for (var i = 0, j = vs.length - 1; i < vs.length; j = i++) {
+            var xi = vs[i].x, yi = vs[i].y;
+            var xj = vs[j].x, yj = vs[j].y;
+    
+            var intersect = ((yi > y) != (yj > y))
+                && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+            if (intersect) inside = !inside;
+        }
+    
+        return inside;
     };
 
+
     check() {
-        var temp = document.createElement('canvas');
-        temp.width = this.game.mainBuffer.width;
-        temp.height = this.game.mainBuffer.height;
-        var cty = temp.getContext('2d');
-        cty.strokeStyle = "#FF0000";
-        this.rockPolygons.forEach(rock => {
+        if (this.showDev) {
+            var temp = document.createElement('canvas');
+            temp.width = this.game.mainBuffer.width;
+            temp.height = this.game.mainBuffer.height;
+            var cty = temp.getContext('2d');
+            cty.strokeStyle = "#FF0000";
+            this.rockPolygons.forEach(rock => {
 
-            cty.moveTo(rock.points[0].x, rock.points[0].y);
-            rock.points.forEach(point => {
-                cty.lineTo(point.x, point.y);
-                cty.stroke();
-            });
-            cty.closePath();
-            cty.stroke();
-        })
-        var temp2 = document.createElement('canvas');
-        temp2.width = this.game.mainBuffer.width;
-        temp2.height = this.game.mainBuffer.height;
-        var cty2 = temp2.getContext('2d');
-
-        console.log(this.game.player.lineSegments);
-        return (ctx) => { // devlopment mode
-            ctx.drawImage(temp, 0, 0);
-            temp2.width = temp2.width;
-            cty2.strokeStyle = "#FF0000";
-            this.playerPolygons.forEach(player => {
-                cty2.moveTo(player.points[0].x, player.points[0].y);
-                player.points.forEach(point => {
-                    cty2.lineTo(point.x, point.y);
-                    cty2.stroke();
+                cty.moveTo(rock.points[0].x, rock.points[0].y);
+                rock.points.forEach(point => {
+                    cty.lineTo(point.x, point.y);
+                    cty.stroke();
                 });
-                cty2.closePath();
-                cty2.stroke();
-            
-                var cstate = {
-                    "top": false,
-                    "right": false,
-                    "bottom" : this.ground,
-                    "left": false
+                cty.closePath();
+                cty.stroke();
+            })
+            var temp2 = document.createElement('canvas');
+            temp2.width = this.game.mainBuffer.width;
+            temp2.height = this.game.mainBuffer.height;
+            var cty2 = temp2.getContext('2d');
+        }
+
+        return (ctx) => { // devlopment mode
+            if (this.showDev) {
+                ctx.drawImage(temp, 0, 0);
+                temp2.width = temp2.width;
+                cty2.strokeStyle = "#FF0000";
+            }
+            this.playerPolygons.forEach(player => {
+
+                if (this.showDev) {
+                    cty2.moveTo(player.points[0].x, player.points[0].y);
+                    player.points.forEach(point => {
+                        cty2.lineTo(point.x, point.y);
+                        cty2.stroke();
+                    });
+                    cty2.closePath();
+                    cty2.stroke();
                 }
-                
+            
+                this.state = [];
                 this.rockPolygons.forEach(rock => {
-                    if (this.canCollide(player, rock)) {     
-                        rock.getLineSegments().forEach(rline => {
-                            player.getLineSegments().forEach(pline => {
-                            if (this.intersects(pline, rline)) {
-                                cstate[pline.i] = true;
-                                console.log("Collision at ", pline.i);
-                            }
-                            });
+                    if (this.canCollide(player, rock)) {  
+                        player.points.forEach(point => {
+                            if (this.contains(point, rock.points))
+                                this.state.push(point.i);
                         });
-                        if (!cstate.left && !cstate.right && !cstate.bottom && !cstate.top)
-                            this.ground = false;
-                        else this.ground = cstate.ground;
-                        if ((cstate.left && cstate.right && (cstate.bottom || (!this.game.player.isFlying && !cstate.top)))) {
-                            // cstate.left = false;
-                            // cstate.right = false;
-                            cstate.bottom = true; 
-                        }
-                        if ((cstate.left && cstate.right && (cstate.top || (this.game.player.isFlying && !cstate.bottom)))) {
-                            // cstate.left = false;
-                            // cstate.right = false;
-                            cstate.top = true;
-                        }
-                        this.game.player.collisionState = cstate;
+                        //console.log(this.state);
+                        player.cstate = this.state;
                         return;
                     }
                 });
@@ -121,7 +109,6 @@ class Collision {
             cty2.clearRect(0, 0, temp2.width, temp2.height);
         }
     }
-
 }
 
 export default Collision;

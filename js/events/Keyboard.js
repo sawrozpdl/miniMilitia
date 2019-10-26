@@ -2,6 +2,7 @@ class Keyboard {
 
     constructor() {
         this.keyMap = new Map();
+        this.keyState = new Map();
         window.addEventListener('keydown', (event) => {
             this.handleDown(event);
         });

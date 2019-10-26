@@ -37,14 +37,10 @@ class Entity extends Polygon {
         this.isWalking = false;
         this.isFlying = false;
         this.isShifted = false;
+        this.hasLanded = false;
         this.velocity = new Vector(0, 0);
         this.gravity = 0.3;
-        this.collisionState = {
-            "top" : false,
-            "right" : false,
-            "bottom" : false,
-            "left" : false
-        }
+        this.cstate = [];
         this.height = (this.parts.head.getHeight() + 
                       this.parts.body.getHeight() +
                       this.parts.lLeg.getHeight()) * 0.93; //parts are intersected
@@ -67,7 +63,6 @@ class Entity extends Polygon {
         this.audios.walk.volume = 0.5;
     }
 
-
     thruster() {
         return this.thruster;
     }
@@ -89,16 +84,35 @@ class Entity extends Polygon {
     }
 
     shoot() {
-
+        this.parts.lHand.shoot();
+        this.parts.rHand.shoot();
     }
 
     moveLeft() {
+        if (this.hasRockLeft()) {
+            this.stopWalking();
+            return;
+        }
         this.isWalking = true;
+        if (this.hasRockBelow() && this.canClimbLeft()) {
+            this.position.y -= 1;
+            this.position.x -= 1;
+            return;
+        }
         this.velocity.x = -2;
     }
 
     moveRight() {
+        if (this.hasRockRight()) {
+            this.stopWalking();
+            return;
+        }
         this.isWalking = true;
+        if (this.hasRockBelow() && this.canClimbRight()) {
+            this.position.y -= 1;
+            this.position.x += 1;
+            return;
+        }
         this.velocity.x = 2;
     }
 
@@ -108,6 +122,11 @@ class Entity extends Polygon {
     }
 
     flyUp() {
+        console.log(this.cstate, this.hasRockAbove());
+        if (this.hasRockAbove()) {
+            this.stopFlying();
+            return;
+        }
         this.isFlying = true;
         this.velocity.y = -4; //fix this
     }
@@ -117,20 +136,42 @@ class Entity extends Polygon {
         this.velocity.y = 0;
     }
 
-    pushUp() {
-        this.position.y -= 2;
+    hasRockBelow() {
+        return this.cstate.includes(4) ||
+                this.cstate.includes(5) ||
+                this.cstate.includes(6);
     }
 
-    isColliding() {
-        return this.collisionState.top ||
-                this.collisionState.right ||
-                this.collisionState.bottom ||
-                this.collisionState.left 
+    hasRockAbove() {
+        return this.cstate.includes(0) ||
+                this.cstate.includes(1) ||
+                this.cstate.includes(2);
     }
 
+    hasRockLeft() {
+        return (this.cstate.includes(7)) ||
+               (this.cstate.includes(0)) 
+    }
+
+    hasRockRight() {
+        return (this.cstate.includes(3)) ||
+               (this.cstate.includes(2)) 
+    }
+
+    canClimbLeft() {
+        return (this.cstate.includes(6) && !this.cstate.includes(7) && !this.cstate.includes(0));
+    }
+
+    canClimbRight() {
+        return (this.cstate.includes(4) && !this.cstate.includes(2) && !this.cstate.includes(3));
+    }
     
 
     draw() {
+        if (this.hasRockAbove()) {
+            this.stopFlying();
+            return;
+        }
         let buffer = document.createElement('canvas');
         buffer.height = this.height * this.scale * 1.5;
         buffer.width = this.width * this.scale * 1.5;
@@ -174,10 +215,18 @@ class Entity extends Polygon {
                 bPart.gPosition.y = this.position.y + bPart.lPosition.y;
             }
 
-            if (this.collisionState.bottom) {
+            if (this.hasRockBelow() && !this.isFlying) {
                 this.velocity.y = -this.gravity;
+                if (!this.hasLanded) {
+                    this.hasLanded = true;
+                    this.audios.land.play();
+                }
             }
-            if (this.isFlying) this.gravity = 0;
+            //else if (!this.hasRockAbove()) this.hasLanded = false;
+            if (this.isFlying) {
+                this.gravity = 0;
+                this.hasLanded = false;
+            }
             else this.gravity = 0.3;
             this.velocity.y += this.gravity;
             this.position.add(this.velocity);
@@ -193,7 +242,7 @@ class Entity extends Polygon {
                 if (this.rotation > 0) this.rotationSpeed = -1;
                 if (this.rotation == 0) this.rotationSpeed = 0;
             }
-
+        
             this.rotation += this.rotationSpeed;
     
             if (!this.isFacingRight) {
@@ -210,7 +259,7 @@ class Entity extends Polygon {
             this.updatePoints();
             this.sprite.rotate(buffer, context,
                 this.position.x, this.position.y,
-                1, this.rotation * (Math.PI / 180), {x : 1, y : 1});
+                0.5, this.rotation * (Math.PI / 180), {x : 1, y : 1});
 
         }
 

@@ -39,9 +39,8 @@ class Main {
             y: 0
         };
         this.player = new Player(this.sprite, 'indian',
-                this.playerPosition, this.mouse, 0.3, this.audios);
+                this.playerPosition, this.mouse, 0.5, this.audios);
         this.collision = new Collision(this);
-        console.log(this.collision);
     }
 
     setDimensions() { 
@@ -122,32 +121,18 @@ class Main {
 
     setEventListeners() {
         this.keyListener.for(68, (down) => {
-            if (this.player.collisionState.right) {
-                this.player.pushUp();
-                this.player.stopWalking();
-                return;
-            }
             this.player.moveRight();
         }, (up) => {
             this.player.stopWalking();
         });
 
         this.keyListener.for(65, (down) => {
-            if (this.player.collisionState.left) {
-                this.player.pushUp();
-                this.player.stopWalking();
-                return;
-            }
             this.player.moveLeft();
         }, (up) => {
             this.player.stopWalking();
         });
 
         this.keyListener.for(87, (down) => {
-            if (this.player.collisionState.top) {
-                this.player.stopFlying();
-                return;
-            }
             this.player.flyUp();
         }, (up) => {
             this.player.stopFlying();
@@ -166,6 +151,10 @@ class Main {
             this.player.dropWeapon();
         });
 
+        this.keyListener.for(221, (down) => {
+            this.collision.showDev = !this.collision.showDev;
+        });
+
         this.keyListener.for(49, (down) => {
             this.camera.setScope(2);
         });
@@ -178,6 +167,12 @@ class Main {
             this.camera.setScope(4);
         });
 
+        this.keyListener.for(77, (down) => {
+            this.camera.showMap();
+        }, (up) => {
+            this.camera.hideMap();
+        });
+
         this.MouseListener.for('mousemove', (e) => {
             this.mouse.x = e.clientX;
             this.mouse.y = e.clientY;
@@ -186,6 +181,8 @@ class Main {
         this.MouseListener.for('click', (e) => {
             this.player.shoot();
         });
+
+
     }
 
     launch() {

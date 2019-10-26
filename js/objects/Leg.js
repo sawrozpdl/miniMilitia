@@ -9,13 +9,14 @@ class Leg extends BodyPart {
         this.isLeft = isLeft;
     }
 
-    rotate(context, angle) {
+    rotate(context, angle, crouch) {
+        
         this.sprite.rotate(this.spriteName,
-             context, this.lPosition.x, this.lPosition.y, this.scale,
-              angle,
+             context, this.lPosition.x + ((crouch) ? (10 + angle * 50) : 0), this.lPosition.y + ((crouch) ? 15 : 0), this.scale,
+             (crouch) ? (Math.PI / 2) : angle,
               {x : 1, y : 0});
 
-        if (this.entity.isFlying && (Math.random() < 0.9)) {
+        if (this.entity.isFlying && (Math.random() < 0.9) && !crouch) {
             this.sprite.rotate('fire',
                 context, this.lPosition.x, this.lPosition.y + this.getHeight() * this.scale, this.scale,
                  angle,

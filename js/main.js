@@ -132,6 +132,12 @@ class Main {
             this.player.stopWalking();
         });
 
+        this.keyListener.for(83, (down) => {
+            this.player.crouch();
+        }, (up) => {
+            this.player.unCrouch();
+        });
+
         this.keyListener.for(87, (down) => {
             this.player.flyUp();
         }, (up) => {
@@ -182,7 +188,6 @@ class Main {
             this.player.shoot();
         });
 
-
     }
 
     launch() {
@@ -194,6 +199,7 @@ class Main {
             this.layers.push(this.map.getCollisionLayer());
             this.layers.setCamera(this.camera.update());
             this.setEventListeners();
+            this.animation.syncKeyboard(this.keyListener);
         });
     }
 }

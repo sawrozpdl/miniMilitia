@@ -15,47 +15,48 @@ class Polygon {
 
     updatePoints() { // for bots and players
         if (!this.isPlayer) return; //static rocks dont need update
-        var offSet = ((!this.isFacingRight) ? this.width * 0.35 / 2 : 0);
+        var offSetX = ((!this.isFacingRight) ? this.width * 0.35 / 2 : 0);
+        var offSetY = (this.isCrouching) ? -10 : 0;
         //var angOffset = this.rotation * this.width * 0.005;
         this.points = [
             {
-                x : this.position.x + offSet,
+                x : this.position.x + offSetX,
                 y : this.position.y,
                 i : 0
             }, 
             {
-                x : this.position.x + (offSet + this.width * 0.2) / 2,
+                x : this.position.x + (offSetX + this.width * 0.2) / 2,
                 y : this.position.y,
                 i : 1
             }, 
             {
-                x : this.position.x + offSet + this.width * 0.2,
+                x : this.position.x + offSetX + this.width * 0.2,
                 y : this.position.y,
                 i : 2
             },
             {
-                x : this.position.x + offSet + this.width * 0.2,
+                x : this.position.x + offSetX + this.width * 0.2,
                 y : this.position.y + (this.height * 0.25) / 2,
                 i : 3
             },
             {
-                x : this.position.x + offSet + this.width * 0.2,
-                y : this.position.y + this.height * 0.25,
+                x : this.position.x + offSetX + this.width * 0.2,
+                y : this.position.y + offSetY + this.height * 0.25,
                 i : 4
             },
             {
-                x : this.position.x + offSet + this.width * 0.1,
-                y : this.position.y + this.height * 0.25,
+                x : this.position.x + offSetX + this.width * 0.1,
+                y : this.position.y + offSetY + this.height * 0.25,
                 i : 5
             },
             {
-                x : this.position.x + offSet,
-                y : this.position.y + this.height * 0.25,
+                x : this.position.x + offSetX,
+                y : this.position.y + offSetY + this.height * 0.25,
                 i : 6
             },
             {
-                x : this.position.x + offSet,
-                y : this.position.y + (this.height * 0.25) / 2,
+                x : this.position.x + offSetX,
+                y : this.position.y + offSetY + (this.height * 0.25) / 2,
                 i : 7
             }
         ];

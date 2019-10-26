@@ -38,6 +38,7 @@ class Entity extends Polygon {
         this.isFlying = false;
         this.isShifted = false;
         this.hasLanded = false;
+        this.isCrouching = false;
         this.velocity = new Vector(0, 0);
         this.gravity = 0.3;
         this.cstate = [];
@@ -86,6 +87,14 @@ class Entity extends Polygon {
     shoot() {
         this.parts.lHand.shoot();
         this.parts.rHand.shoot();
+    }
+
+    crouch() {
+        this.isCrouching = true;
+    }
+
+    unCrouch() {
+        this.isCrouching = false;
     }
 
     moveLeft() {
@@ -192,14 +201,15 @@ class Entity extends Polygon {
             this.isFacingRight = (this.position.x % 1366) < this.mouse.x;
             if (this.isFlying) this.audios.jet.play();
             if (!this.isWalking && !this.isFlying) this.angle = 0;
-            else this.audios.walk.play();
+            else if (!this.isCrouching) this.audios.walk.play();
 
             
             bufferCtx.clearRect(0, 0, buffer.width, buffer.height);
 
             this.parts.rHand.draw(bufferCtx);
-            this.parts.rLeg.rotate(bufferCtx, this.angle * (Math.PI / 180));
-            this.parts.lLeg.rotate(bufferCtx, -1 * this.angle* (Math.PI / 180));
+
+            this.parts.rLeg.rotate(bufferCtx, this.angle * (Math.PI / 180), this.isCrouching);
+            this.parts.lLeg.rotate(bufferCtx, -1 * this.angle* (Math.PI / 180), this.isCrouching);
 
             this.angle += this.angularSpeed;
             if (this.angle > 10 || this.angle < -10) 
@@ -222,7 +232,7 @@ class Entity extends Polygon {
                     this.audios.land.play();
                 }
             }
-            //else if (!this.hasRockAbove()) this.hasLanded = false;
+            //else if (!this.hasRockBelow()) this.hasLanded = false;
             if (this.isFlying) {
                 this.gravity = 0;
                 this.hasLanded = false;

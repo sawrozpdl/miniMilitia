@@ -131,7 +131,6 @@ class Entity extends Polygon {
     }
 
     flyUp() {
-        console.log(this.cstate, this.hasRockAbove());
         if (this.hasRockAbove()) {
             this.stopFlying();
             return;
@@ -175,12 +174,30 @@ class Entity extends Polygon {
         return (this.cstate.includes(4) && !this.cstate.includes(2) && !this.cstate.includes(3));
     }
     
+    checkCols() {
+        if (this.cstate.includes(2) && this.cstate.includes(7)) {
+            this.position.x += 3;
+            this.position.y += 3;
+        }
+        if (this.cstate.includes(2) && this.cstate.includes(3)) {
+            this.position.x -= 3;
+            this.position.y += 3;
+        }
+        if (this.cstate.includes(5) && this.cstate.includes(7)) {
+            this.position.x += 3;
+            this.position.y -= 3;
+        }
+        if (this.cstate.includes(5) && this.cstate.includes(3)) {
+            this.position.x -= 3;
+            this.position.y -= 3;
+        }
+        if ((this.cstate.includes(0) && this.cstate.includes(2)) ||
+        (this.cstate.includes(1) && this.cstate.includes(2)) || (this.cstate.includes(0) && this.cstate.includes(3))) {
+            this.position.y += 3;
+        }
+    }
 
     draw() {
-        if (this.hasRockAbove()) {
-            this.stopFlying();
-            return;
-        }
         let buffer = document.createElement('canvas');
         buffer.height = this.height * this.scale * 1.5;
         buffer.width = this.width * this.scale * 1.5;
@@ -198,6 +215,7 @@ class Entity extends Polygon {
         this.updatePoints();
 
         return (context) => {
+            this.checkCols();
             this.isFacingRight = (this.position.x % 1920) < this.mouse.x;
             if (this.isFlying) this.audios.jet.play();
             if (!this.isWalking && !this.isFlying) this.angle = 0;

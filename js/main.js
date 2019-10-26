@@ -138,8 +138,6 @@ class Main {
         });
 
         this.keyListener.for(87, (down) => {
-            // console.log(this.collision.check()(this.context));
-            // this.collision.check()(this.context);
             this.player.flyUp();
         }, (up) => {
             this.player.stopFlying();
@@ -150,7 +148,6 @@ class Main {
         });
 
         this.keyListener.for(9, (down) => {
-            this.collision.canCollide();
             this.player.switchWeapon();
         });
 

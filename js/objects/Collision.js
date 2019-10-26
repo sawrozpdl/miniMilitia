@@ -47,7 +47,24 @@ class Collision {
         }
     
         return inside;
-    };
+    }
+
+    setCollisionState() {
+        this.playerPolygons.forEach(player => {
+            this.state = [];
+            this.rockPolygons.forEach(rock => {
+                if (this.canCollide(player, rock)) {  
+                    player.points.forEach(point => {
+                        if (this.contains(point, rock.points))
+                            this.state.push(point.i);
+                    });
+                    console.log(this.state);
+                    player.cstate = this.state;
+                    return;
+                }
+            });
+        });
+    }
 
 
     check() {
@@ -90,20 +107,8 @@ class Collision {
                 });
             }
             
-            this.playerPolygons.forEach(player => {
-                this.state = [];
-                this.rockPolygons.forEach(rock => {
-                    if (this.canCollide(player, rock)) {  
-                        player.points.forEach(point => {
-                            if (this.contains(point, rock.points))
-                                this.state.push(point.i);
-                        });
-                        //console.log(this.state);
-                        player.cstate = this.state;
-                        return;
-                    }
-                });
-            });
+            this.setCollisionState();
+
         }
     }
 }

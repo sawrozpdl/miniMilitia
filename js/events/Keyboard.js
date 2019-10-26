@@ -2,7 +2,6 @@ class Keyboard {
 
     constructor() {
         this.keyMap = new Map();
-        this.keyState = new Map();
         window.addEventListener('keydown', (event) => {
             this.handleDown(event);
         });
@@ -16,8 +15,8 @@ class Keyboard {
         if (!this.keyMap.has(keyCode))
             return;
         event.preventDefault();
+
         this.keyMap.get(keyCode)[0](event);
-        //this.keyState.set(keyCode, false);
     } 
 
     handleUp(event) {
@@ -31,7 +30,6 @@ class Keyboard {
 
     for(keyCode, callbackDown, callbackUp) {
         this.keyMap.set(keyCode, [callbackDown, callbackUp]);
-        //this.keyState.set(keyCode, true);
     }
 
 }

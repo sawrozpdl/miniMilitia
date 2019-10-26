@@ -29,6 +29,8 @@ class Layers {
         if (this.camera)
             this.camera(this.context);
     }
+
+    
 }
 
 export default Layers;

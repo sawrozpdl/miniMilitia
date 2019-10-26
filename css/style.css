@@ -4,22 +4,13 @@
 }
 
 body {
-    background: black;
-    height: 100%;
-}
-
-.main-wrapper {
-    margin : 40px auto 40px auto;
-    border: 1px solid red;
-    /* overflow  : hidden; */
-    width: 1366px;
-    height : 768px;
+    overflow: hidden;
+    background : black;
 }
 
 #game-container {
-    cursor : none;
+    background-color: #1A1A1A;
 }
-
 
 @media only screen and (max-width:768px) {
 

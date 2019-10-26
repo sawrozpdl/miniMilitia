@@ -1,11 +1,15 @@
 class Sprite {
 
-    constructor(image) {
-        this.image = image;
+    constructor() {
+        this.image = undefined;
         this.objects = new Map();
 
         this.tempBuffer = document.createElement('canvas');
         this.tempCtx = this.tempBuffer.getContext('2d');
+    }
+
+    setSpriteSheet(image) {
+        this.image = image;
     }
 
     set(name, x, y, width, height) {
@@ -42,7 +46,7 @@ class Sprite {
     }
 
     rotate(element, context, x, y, scale, angle, orientation) {
-        let buffer = (element instanceof HTMLCanvasElement) ?
+        let buffer = (element instanceof HTMLCanvasElement || element instanceof Image) ?
             element : this.objects.get(element);
         var coord = { // 0,0 for lefttop, 0,1 for leftcenter, 0,2 for leftbottom ...
             x: orientation.x * (buffer.width / 2) * scale,

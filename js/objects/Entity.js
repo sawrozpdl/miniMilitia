@@ -198,7 +198,7 @@ class Entity extends Polygon {
         this.updatePoints();
 
         return (context) => {
-            this.isFacingRight = (this.position.x % 1366) < this.mouse.x;
+            this.isFacingRight = (this.position.x % 1920) < this.mouse.x;
             if (this.isFlying) this.audios.jet.play();
             if (!this.isWalking && !this.isFlying) this.angle = 0;
             else if (!this.isCrouching) this.audios.walk.play();
@@ -258,14 +258,7 @@ class Entity extends Polygon {
             if (!this.isFacingRight) {
                 this.sprite.flip(buffer);
             }
-            // if (!this.isFacingRight && !this.isShifted) {
-            //     this.position.x -= this.width * this.scale * 0.8;
-            //     this.isShifted = true;
-            // }
-            // if (this.isFacingRight && this.isShifted) {
-            //     this.position.x += this.width * this.scale * 0.8;
-            //     this.isShifted = false;   
-            // }
+
             this.updatePoints();
             this.sprite.rotate(buffer, context,
                 this.position.x, this.position.y,

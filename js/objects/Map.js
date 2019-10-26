@@ -14,6 +14,8 @@ class Map {
         this.height = this.mapData.map.height;
         this.tileWidth = this.mapData.map.tileWidth;
         this.tileHeight = this.mapData.map.tileHeight;
+        this.gridWidth = this.mapData.tileSheet.tileWidth;
+        this.gridHeight = this.mapData.tileSheet.tileHeight;
         this.tileData = this.mapData.tileSheet;
         this.margin = this.tileData.margin;
 
@@ -40,8 +42,8 @@ class Map {
 
     getImageCoord(gid) {
         var grid = this.getImageGrid(gid);
-        return [this.margin + grid[1] * (this.margin + this.tileWidth),
-            this.margin + grid[0] * (this.margin + this.tileHeight)
+        return [this.margin + grid[1] * (this.margin + this.gridWidth),
+            this.margin + grid[0] * (this.margin + this.gridHeight)
         ];
     }
 
@@ -74,7 +76,7 @@ class Map {
         this.background.forEach(gid => {
             this.tile = this.getImageCoord(gid - 1);
             this.loc = this.getTileCoord(this.c);
-            this.bufferCtx.drawImage(this.tileSheet, this.tile[0], this.tile[1], this.tileWidth, this.tileHeight,
+            this.bufferCtx.drawImage(this.tileSheet, this.tile[0], this.tile[1], this.gridWidth, this.gridHeight,
             this.loc[0], this.loc[1], this.tileWidth, this.tileHeight);
             this.c++;
         });
@@ -88,7 +90,7 @@ class Map {
         this.foreground.forEach(gid => {
             this.tile = this.getImageCoord(gid - 1);
             this.loc = this.getTileCoord(this.c);
-            this.bufferCtx.drawImage(this.tileSheet, this.tile[0], this.tile[1], this.tileWidth, this.tileHeight,
+            this.bufferCtx.drawImage(this.tileSheet, this.tile[0], this.tile[1], this.gridWidth, this.gridHeight,
             this.loc[0], this.loc[1], this.tileWidth, this.tileHeight);
             this.c++;
         });

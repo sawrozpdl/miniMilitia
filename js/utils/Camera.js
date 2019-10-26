@@ -17,7 +17,6 @@ class Camera {
         this.dy = 6; // change in y cord
         this.xx = 0; // final x cord
         this.yy = 0; // final y cord
-        this.mapOpacity = 0.5;
         this.horizontalViewPoint = 0;
         this.verticalViewpoint = 0;
     }
@@ -28,7 +27,6 @@ class Camera {
 
     hideMap() {
         this.map = false;
-        this.mapOpacity = 0.5;
     }
 
     generateBackground(image) { // stores the backgroud in buffer and passes to layers to draw
@@ -67,11 +65,14 @@ class Camera {
             );
             this.game.mainContext.drawImage(this.visible, 0, 0, this.width, this.height);
             //context.fillRect(this.game.player.position.x, this.game.player.position.y, this.game.player.width, this.game.player.height);
-            this.game.mainContext.globalAlpha = this.mapOpacity; 
+            context.strokeStyle = 'white';
+            context.lineWidth = 20;
+            context.strokeRect(0, 0, this.game.mainBuffer.width, this.game.mainBuffer.height);
             if (this.map) {
+                this.game.mainContext.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                this.game.mainContext.fillRect(20, this.height - 300, 780, 270);
                 this.game.mainContext.drawImage(this.game.mainBuffer, 0, 0, this.game.mainBuffer.width, this.game.mainBuffer.height,
-                                0, 0, 520, 180);
-                this.mapOpacity += 0.005;
+                                20, this.height - 290, 780, 270);
             }
             context.clearRect(0, 0, this.game.mainBuffer.width, this.game.mainBuffer.height);
         }

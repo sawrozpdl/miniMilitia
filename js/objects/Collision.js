@@ -10,7 +10,7 @@ class Collision {
         
         this.state = [];
 
-        this.showDev = true;
+        this.showDev = false;
     }
 
 
@@ -51,11 +51,12 @@ class Collision {
 
 
     check() {
-        if (this.showDev) {
-            var temp = document.createElement('canvas');
-            temp.width = this.game.mainBuffer.width;
+        var temp = document.createElement('canvas');
+        var cty = temp.getContext('2d');
+        var temp2 = document.createElement('canvas');
+        var cty2 = temp2.getContext('2d');
+        temp.width = this.game.mainBuffer.width;
             temp.height = this.game.mainBuffer.height;
-            var cty = temp.getContext('2d');
             cty.strokeStyle = "#FF0000";
             this.rockPolygons.forEach(rock => {
 
@@ -67,21 +68,16 @@ class Collision {
                 cty.closePath();
                 cty.stroke();
             })
-            var temp2 = document.createElement('canvas');
             temp2.width = this.game.mainBuffer.width;
             temp2.height = this.game.mainBuffer.height;
-            var cty2 = temp2.getContext('2d');
-        }
 
-        return (ctx) => { // devlopment mode
+        return (context) => { 
+
             if (this.showDev) {
-                ctx.drawImage(temp, 0, 0);
+                context.drawImage(temp, 0, 0);
                 temp2.width = temp2.width;
                 cty2.strokeStyle = "#FF0000";
-            }
-            this.playerPolygons.forEach(player => {
-
-                if (this.showDev) {
+                this.playerPolygons.forEach(player => {
                     cty2.moveTo(player.points[0].x, player.points[0].y);
                     player.points.forEach(point => {
                         cty2.lineTo(point.x, point.y);
@@ -89,8 +85,12 @@ class Collision {
                     });
                     cty2.closePath();
                     cty2.stroke();
-                }
+                    context.drawImage(temp2, 0, 0);
+                    cty2.clearRect(0, 0, temp2.width, temp2.height);  
+                });
+            }
             
+            this.playerPolygons.forEach(player => {
                 this.state = [];
                 this.rockPolygons.forEach(rock => {
                     if (this.canCollide(player, rock)) {  
@@ -103,10 +103,7 @@ class Collision {
                         return;
                     }
                 });
-                
             });
-            ctx.drawImage(temp2, 0, 0);
-            cty2.clearRect(0, 0, temp2.width, temp2.height);
         }
     }
 }

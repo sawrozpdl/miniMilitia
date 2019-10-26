@@ -34,9 +34,8 @@ class Hand extends BodyPart{
     }
 
     draw(context) { //OPT
-        var dy = (this.mouse.y - (this.gPosition.y));
-        var dx = (this.mouse.x - (this.gPosition.x % 1366));
-        
+        var dy = (this.mouse.y - (this.gPosition.y % 1080));
+        var dx = (this.mouse.x - (this.gPosition.x % 1920));
         this.angle = (this.entity.isFacingRight) ? Math.atan2(dy, dx) : -Math.atan(dy / dx);
         if (this.hasEquippedGun) this.equippedGun.draw(context);
         this.sprite.rotate(this.spriteName,
@@ -44,8 +43,6 @@ class Hand extends BodyPart{
               this.scale,this.angle,
               {x : 0, y : 1});
     }
-
-    
 
 }
 

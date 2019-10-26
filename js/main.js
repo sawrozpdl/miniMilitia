@@ -19,14 +19,16 @@ class Main {
 
     constructor(canvas) {
         this.canvas = canvas;
-        this.GAME_WIDTH = 1366;
-        this.GAME_HEIGHT = 768;
+        canvas.style.width = "100%";
+        canvas.style.height = "100%";
+        this.GAME_WIDTH = 2223;
+        this.GAME_HEIGHT = 1080;
         this.FRAME_LIMIT = 60;
-        this.speedFactor = 60 / this.FRAME_LIMIT;
-
+        
         this.mainContext = this.canvas.getContext('2d');
         this.mainBuffer = document.createElement('canvas');
         this.context = this.mainBuffer.getContext('2d');
+        this.sprite = new Sprite();
         this.layers = new Layers(this.context);
         this.animation = new Animator(this.FRAME_LIMIT);
     }
@@ -69,15 +71,12 @@ class Main {
                     this.GAME_WIDTH, this.GAME_HEIGHT);
                 context.drawImage(logo, 0, 0,
                     logo.width, logo.height,
-                    (this.GAME_WIDTH - logo.width) / 2,
-                    (this.GAME_HEIGHT - 2 * logo.height) / 2,
-                    logo.width, logo.height);
-                context.drawImage(loading, loading.height * i, 0,
-                    loading.height, loading.height,
-                    (this.GAME_WIDTH - loading.height) / 2,
-                    (this.GAME_HEIGHT + loading.height) / 2,
-                    loading.height, loading.height);
-                i = ++i % 8;
+                    (this.GAME_WIDTH - logo.width * 1.5) / 2,
+                    (this.GAME_HEIGHT - 2 * logo.height * 1.5) / 2,
+                    logo.width * 1.5, logo.height * 1.5);
+                this.sprite.rotate(loading, context, (this.GAME_WIDTH - loading.width * 0.1) / 2,
+                (logo.height * 2 + loading.height) / 2, 0.1, i * Math.PI/180, {x : 1, y : 1});
+                i+=20;
             });
             this.animation.setFrameLimit(this.FRAME_LIMIT / 4);
             this.startAnimation();
@@ -97,7 +96,7 @@ class Main {
         ]).then(([media, spriteMap, mapData]) => {
             this.images = media.images;
             this.audios = media.audios;
-            this.sprite = new Sprite(this.images.spritesheet);
+            this.sprite.setSpriteSheet(this.images.spritesheet);
             this.map = new Map(mapData);
             this.map.init();
             this.mainBuffer.height = this.map.getHeight();
@@ -139,6 +138,8 @@ class Main {
         });
 
         this.keyListener.for(87, (down) => {
+            // console.log(this.collision.check()(this.context));
+            // this.collision.check()(this.context);
             this.player.flyUp();
         }, (up) => {
             this.player.stopFlying();
@@ -162,15 +163,19 @@ class Main {
         });
 
         this.keyListener.for(49, (down) => {
-            this.camera.setScope(2);
+            this.camera.setScope(1.5);
         });
 
         this.keyListener.for(50, (down) => {
-            this.camera.setScope(3);
+            this.camera.setScope(2);
         });
 
         this.keyListener.for(51, (down) => {
-            this.camera.setScope(4);
+            this.camera.setScope(2.5);
+        });
+
+        this.keyListener.for(52, (down) => {
+            this.camera.setScope(3);
         });
 
         this.keyListener.for(77, (down) => {
@@ -199,7 +204,6 @@ class Main {
             this.layers.push(this.map.getCollisionLayer());
             this.layers.setCamera(this.camera.update());
             this.setEventListeners();
-            this.animation.syncKeyboard(this.keyListener);
         });
     }
 }

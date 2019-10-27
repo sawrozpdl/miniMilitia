@@ -3,7 +3,6 @@ import Hand from "./Hand.js";
 import Body from "./Body.js";
 import Leg from "./Leg.js";
 import {Vector} from '../utils/Math.js';
-import Gun from "./Gun.js";
 import Polygon from "./Polygon.js";
 
 class Entity extends Polygon {
@@ -16,7 +15,6 @@ class Entity extends Polygon {
         this.position = position;
         this.scale = scale;
         this.audios = audios;
-        this.isLimited = false; // timespan infinite if not killed
         this.parts = {
             head : new Head(this),
             lHand : new Hand(this, true),
@@ -25,14 +23,14 @@ class Entity extends Polygon {
             lLeg : new Leg(this, true),
             rLeg : new Leg(this, false)
         }
+        this.mergeParts();
     }
 
     spawn() {
         this.isKilled = false;
         this.thruster = 100;
         this.health = 100;
-        this.dthruster = 1;
-        this.dhealth = 0.5;
+        this.dthruster = 2.5;
         this.isFacingRight = true;
         this.isWalking = false;
         this.isFlying = false;
@@ -45,12 +43,17 @@ class Entity extends Polygon {
         this.height = (this.parts.head.getHeight() + 
                       this.parts.body.getHeight() +
                       this.parts.lLeg.getHeight()) * 0.93; //parts are intersected
-
-        this.parts.lHand.equip(new Gun(this.parts.lHand, (Math.random() < 0.5) ? 'pistol' : 'uzi')); // spawn player with a gun at first
-        this.parts.rHand.equip(new Gun(this.parts.rHand, (Math.random() < 0.5) ? 'pistol' : 'uzi')); // REMOVE
         
-        this.width = this.parts.body.getWidth() + this.parts.lHand.getWidth() / (3 / 2); //hands are intersected
         this.setConfigs();
+    }
+
+    mergeParts() {
+        this.parts.head.lPosition = {x : 0, y : 0}
+        this.parts.body.lPosition = {x : 10 * this.scale, y : (this.parts.head.getHeight() - 10) * this.scale};
+        this.parts.lLeg.lPosition = {x : 17 * this.scale, y : this.parts.body.lPosition.y + (this.parts.body.getHeight() - 15) * this.scale}
+        this.parts.rLeg.lPosition = {x : (this.parts.body.getWidth() * this.scale + 5 * this.scale) / 2, y : this.parts.lLeg.lPosition.y}
+        this.parts.lHand.lPosition = {x : this.scale * 17, y: this.parts.body.lPosition.y + 12 * this.scale}
+        this.parts.rHand.lPosition = {x : this.parts.rLeg.lPosition.x + this.scale * 10, y : this.parts.lHand.lPosition.y}
     }
 
     setConfigs() {
@@ -64,29 +67,45 @@ class Entity extends Polygon {
         this.audios.walk.volume = 0.5;
     }
 
-    thruster() {
-        return this.thruster;
+    pickAmmo(gun) {
+        if (this.parts.lHand.equippedGun.spriteName == gun.spriteName)
+            this.parts.lHand.equippedGun.pickAmmo(gun);
+        else if (this.parts.rHand.equippedGun.spriteName == gun.spriteName)
+            this.parts.rHand.equippedGun.pickAmmo(gun);
     }
 
-    health() {
-        return this.health;
-    }
-
-    isKilled() {
-        return this.isKilled;
-    }
-
-    getHeight() {
-        return this.height;
-    }
-
-    move(vector) {
-        this.position.add(vector);
+    equip(gun) {
+        if (gun) {
+            if (this.parts.lHand.hasEquippedGun && !this.parts.rHand.hasEquippedGun) {
+                if (this.parts.lHand.equippedGun.spriteName === gun.spriteName) {
+                    this.parts.rHand.equip(gun);
+                    gun.setOwner(this.parts.rHand);
+                    return;
+                }
+            }
+            else {
+                if (this.parts.lHand.hasEquippedGun) this.parts.lHand.throw();
+                this.parts.lHand.equip(gun);
+                gun.setOwner(this.parts.lHand);
+            }
+        } 
+        else {
+            if (this.parts.rHand.hasEquippedGun)
+                this.parts.rHand.throw();
+            else if (this.parts.lHand.hasEquippedGun)
+                this.parts.lHand.throw();
+        }
+        this.width = this.parts.body.getWidth() + this.parts.lHand.getWidth() / 1;
     }
 
     shoot() {
         this.parts.lHand.shoot();
         this.parts.rHand.shoot();
+    }
+
+    reload() {
+        this.parts.lHand.reload();
+        this.parts.rHand.reload();
     }
 
     crouch() {
@@ -95,6 +114,7 @@ class Entity extends Polygon {
 
     unCrouch() {
         this.isCrouching = false;
+        this.position.y -= 10;
     }
 
     moveLeft() {
@@ -131,12 +151,13 @@ class Entity extends Polygon {
     }
 
     flyUp() {
-        if (this.hasRockAbove()) {
+        if (this.hasRockAbove() || this.thruster <= 0) {
             this.stopFlying();
             return;
         }
         this.isFlying = true;
         this.velocity.y = -4; //fix this
+        this.thruster -= this.dthruster;
     }
 
     stopFlying() {
@@ -197,6 +218,23 @@ class Entity extends Polygon {
         }
     }
 
+    getShot(bullet) {
+        if (this.health <= bullet.damage) this.kill();
+        else {
+            this.health -= bullet.damage;
+        }
+    }
+
+    
+
+    kill() {
+        console.log('killed!');
+    }
+
+    reSpawn() {
+
+    }
+
     draw() {
         let buffer = document.createElement('canvas');
         buffer.height = this.height * this.scale * 1.5;
@@ -205,13 +243,6 @@ class Entity extends Polygon {
         buffer.fillstyle = 'green'; //  REMOVE
         bufferCtx.fillRect(0,0,buffer.width, buffer.height); // REMOVE
 
-        this.parts.head.lPosition = {x : 0, y : 0}
-        this.parts.body.lPosition = {x : 10 * this.scale, y : (this.parts.head.getHeight() - 10) * this.scale};
-        this.parts.lLeg.lPosition = {x : 17 * this.scale, y : this.parts.body.lPosition.y + (this.parts.body.getHeight() - 15) * this.scale}
-        this.parts.rLeg.lPosition = {x : (this.parts.body.getWidth() * this.scale + 5 * this.scale) / 2, y : this.parts.lLeg.lPosition.y}
-        this.parts.lHand.lPosition = {x : this.scale * 17, y: this.parts.body.lPosition.y + 12 * this.scale}
-        this.parts.rHand.lPosition = {x : this.parts.rLeg.lPosition.x + this.scale * 10, y : this.parts.lHand.lPosition.y}
-        
         this.updatePoints();
 
         return (context) => {
@@ -220,7 +251,6 @@ class Entity extends Polygon {
             if (this.isFlying) this.audios.jet.play();
             if (!this.isWalking && !this.isFlying) this.angle = 0;
             else if (!this.isCrouching) this.audios.walk.play();
-
             
             bufferCtx.clearRect(0, 0, buffer.width, buffer.height);
 
@@ -250,12 +280,16 @@ class Entity extends Polygon {
                     this.audios.land.play();
                 }
             }
-            //else if (!this.hasRockBelow()) this.hasLanded = false;
+            
             if (this.isFlying) {
                 this.gravity = 0;
                 this.hasLanded = false;
             }
-            else this.gravity = 0.3;
+            else {
+                this.gravity = 0.3;
+                if (this.thruster < 100) this.thruster += this.dthruster / 50;
+            }
+            
             this.velocity.y += this.gravity;
             this.position.add(this.velocity);
            

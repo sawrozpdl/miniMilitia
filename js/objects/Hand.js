@@ -33,6 +33,16 @@ class Hand extends BodyPart{
         this.hasEquippedGun = false;
     }
 
+    reload() {
+        if (this.hasEquippedGun) 
+            this.equippedGun.reload();
+    }
+
+    shoot() {
+        if (this.hasEquippedGun)
+            this.equippedGun.shoot();
+    }
+
     draw(context) { //OPT
         var dy = (this.mouse.y - (this.gPosition.y % 1080));
         var dx = (this.mouse.x - (this.gPosition.x % 1920));

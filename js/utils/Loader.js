@@ -12,6 +12,7 @@ export function loadAudio(url) {
     return new Promise (resolve => {
         var audio = new Audio(url);
         audio.addEventListener('loadeddata', () => {
+            //setTimeout(resolve, 3000, audio);
             resolve(audio);
         });
     });
@@ -20,8 +21,7 @@ export function loadAudio(url) {
 export function loadJson(url) {
     return new Promise(resolve => {
         return fetch(url).then(response => {
-            setTimeout(resolve, 3000, response.json());
-            //resolve(response.json());
+            resolve(response.json());
         });
     });
 }

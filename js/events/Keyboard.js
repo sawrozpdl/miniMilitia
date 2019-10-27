@@ -15,7 +15,6 @@ class Keyboard {
         if (!this.keyMap.has(keyCode))
             return;
         event.preventDefault();
-
         this.keyMap.get(keyCode)[0](event);
     } 
 
@@ -24,8 +23,8 @@ class Keyboard {
         if (!this.keyMap.has(keyCode))
             return;
         event.preventDefault();
-        this.keyMap.get(keyCode)[1](event);
-
+        if (this.keyMap.get(keyCode)[1])
+            this.keyMap.get(keyCode)[1](event);
     }
 
     for(keyCode, callbackDown, callbackUp) {

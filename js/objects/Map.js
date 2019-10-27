@@ -7,6 +7,7 @@ class Map {
 
     constructor(mapData) {
         this.mapData = mapData;
+        this.init();
     }
 
     init() {

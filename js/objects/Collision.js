@@ -5,11 +5,11 @@ class Collision {
         this.rockPolygons = [];
         this.playerPolygons = [];
         this.spans = [];
-
+        this.guns = [];
         this.playerPolygons.push(game.player);
-        
+        this.mainPlayer = game.player;
         this.state = [];
-
+        this.bullets = [];
         this.showDev = false;
     }
 
@@ -58,7 +58,7 @@ class Collision {
                         if (this.contains(point, rock.points))
                             this.state.push(point.i);
                     });
-                    console.log(this.state);
+                    //console.log(this.state);
                     player.cstate = this.state;
                     return;
                 }
@@ -89,6 +89,37 @@ class Collision {
             temp2.height = this.game.mainBuffer.height;
 
         return (context) => { 
+            var i = 0;
+            this.bullets.forEach(bullet => {
+                bullet.update();
+                this.playerPolygons.forEach(player => {
+                    if (player == bullet.player) return;
+                    if (this.canCollide(player, bullet)) {
+                        bullet.hasHit = true;
+                        player.getShot(bullet);
+                    }
+                });
+                this.rockPolygons.forEach(rock => {
+                    if (this.canCollide(rock, bullet)) {
+                        if (this.contains(bullet.position, rock.points)) { // OPT
+                            bullet.hasHit = true;
+                        }
+                            
+                    }
+                });
+                if (bullet.hasHit) this.bullets.splice(i, 1);
+                i++;
+            });
+
+            this.game.canEquip = null;
+            this.guns.forEach(gun => {
+                if (!gun.hasBeenEquipped) {
+                    gun.show(this.game.context);
+                    if (this.canCollide(this.mainPlayer, gun)) {
+                        this.game.canEquip = gun;
+                    }
+                }
+            });
 
             if (this.showDev) {
                 context.drawImage(temp, 0, 0);

@@ -68,9 +68,14 @@ class Camera {
             context.strokeStyle = 'white';
             context.lineWidth = 20;
             context.strokeRect(0, 0, this.game.mainBuffer.width, this.game.mainBuffer.height);
+            context.drawImage(this.game.images.arrowDown, this.game.player.position.x, this.game.player.position.y - 150, 100, 100);
+            this.game.robots.forEach(robot => {
+                context.drawImage(this.game.images.arrowDownRed,
+                             robot.position.x, robot.position.y - 150, 100, 100);
+            });
             if (this.map) {
                 this.game.mainContext.fillStyle = 'rgba(0, 0, 0, 0.5)';
-                this.game.mainContext.fillRect(20, this.height - 300, 780, 270);
+                this.game.mainContext.fillRect(20, this.height - 290, 780, 270);
                 this.game.mainContext.drawImage(this.game.mainBuffer, 0, 0, this.game.mainBuffer.width, this.game.mainBuffer.height,
                                 20, this.height - 290, 780, 270);
             }

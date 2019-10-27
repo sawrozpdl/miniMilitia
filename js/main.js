@@ -7,6 +7,7 @@ import Camera from './utils/Camera.js';
 import Map from './objects/Map.js';
 import Collision from './objects/Collision.js';
 import Player from './objects/Player.js';
+import Gun from './objects/Gun.js';
 import {Vector} from './utils/Math.js';
 import {
     loadImage,
@@ -25,6 +26,7 @@ class Main {
         this.GAME_HEIGHT = 1080;
         this.FRAME_LIMIT = 60;
         
+        this.robots = [];
         this.mainContext = this.canvas.getContext('2d');
         this.mainBuffer = document.createElement('canvas');
         this.context = this.mainBuffer.getContext('2d');
@@ -36,10 +38,14 @@ class Main {
     init() {
         this.keyListener = new Keyboard();
         this.MouseListener = new Mouse(this.canvas);
+        this.guns = [];
+        this.gunNames = ['uzi', 'ak47', 'm16', 'pistol'];
+        this.gunCounter = 0;
         this.mouse = {
             x: 0,
             y: 0
         };
+        this.canEquip = null;
         this.player = new Player(this.sprite, 'indian',
                 this.playerPosition, this.mouse, 0.5, this.audios);
         this.collision = new Collision(this);
@@ -53,6 +59,12 @@ class Main {
     spawnPlayer() {
         this.player.position = new Vector(this.GAME_WIDTH * 0.8, this.GAME_HEIGHT * 0.2);
         this.player.spawn();
+        var lgun = new Gun('uzi', this.sprite, this.gunData, this.collision);
+        var rgun = new Gun('uzi', this.sprite, this.gunData, this.collision);
+        this.player.equip(lgun);
+        this.player.equip(rgun);
+        this.guns.push(lgun);
+        this.guns.push(rgun);
         this.camera = new Camera(this);
         this.layers.push(this.player.draw());
     }
@@ -61,9 +73,9 @@ class Main {
         this.setDimensions();
         this.layers.setContext(this.mainContext);
         Promise.all([
-            loadImage('/assets/images/background-main.png'),
-            loadImage('/assets/images/loading.png'),
-            loadImage('/assets/images/logo.png')
+            loadImage('../assets/images/background-main.png'),
+            loadImage('../assets/images/loading.png'),
+            loadImage('../assets/images/logo.png')
         ]).then(([background,loading, logo]) => {
             var i = 0;
             this.layers.push((context) => {
@@ -90,15 +102,17 @@ class Main {
     loadAssets() {
         this.deployLoadingScreen();
         Promise.all([
-            loadMedia('/json/assets.json'),
-            loadJson('/json/spriteMap.json'),
-            loadJson('/json/outpost.json')
-        ]).then(([media, spriteMap, mapData]) => {
+            loadMedia('../json/assets.json'),
+            loadJson('../json/spriteMap.json'),
+            loadJson('../json/map1.json'),
+            loadJson("../../json/guns.json")
+        ]).then(([media, spriteMap, mapData, gunData]) => {
             this.images = media.images;
             this.audios = media.audios;
             this.sprite.setSpriteSheet(this.images.spritesheet);
             this.map = new Map(mapData);
-            this.map.init();
+            this.spawnPoints = this.map.mapData.map.spawnpoints;
+            this.gunData = gunData;
             this.mainBuffer.height = this.map.getHeight();
             this.mainBuffer.width = this.map.getWidth();
             this.sprite.setMap(spriteMap);
@@ -111,6 +125,29 @@ class Main {
         });
     }
 
+    genGuns() {
+        this.spawnPoints.forEach(point => {
+            var gun = new Gun(this.gunNames[Math.floor(Math.random() * this.gunNames.length)],
+                         this.sprite, this.gunData, this.collision);
+            gun.position.x = point.x;
+            gun.position.y = point.y;
+            console.log(point);
+            this.guns.push(gun);
+        });
+        this.collision.guns = this.guns;
+    }
+
+    despawnGuns() {
+        let c = 0;
+        this.guns.forEach(gun => {
+            if (gun.hasBeenEquipped) {
+                c++;
+                continue;
+            }
+            this.guns.splice(c++, 1);
+        });
+    }
+
     startAnimation() {
         this.animation.callback = () => {
             this.layers.draw();
@@ -119,6 +156,7 @@ class Main {
     }
 
     setEventListeners() {
+
         this.keyListener.for(68, (down) => {
             this.player.moveRight();
         }, (up) => {
@@ -144,7 +182,11 @@ class Main {
         });
 
         this.keyListener.for(70, (down) => {
-            //this.player.pickWeapon();
+            this.player.equip(this.canEquip);
+        });
+
+        this.keyListener.for(71, (down) => {
+            this.player.pickAmmo(this.canEquip);
         });
 
         this.keyListener.for(9, (down) => {
@@ -153,6 +195,10 @@ class Main {
 
         this.keyListener.for(81, (down) => {
             this.player.dropWeapon();
+        });
+
+        this.keyListener.for(82, (down) => {
+            this.player.reload();
         });
 
         this.keyListener.for(221, (down) => {
@@ -198,6 +244,7 @@ class Main {
             this.layers.push(this.map.drawForeground());
             this.spawnPlayer();
             this.layers.push(this.map.drawBushes());
+            this.genGuns();
             this.layers.push(this.map.getCollisionLayer());
             this.layers.setCamera(this.camera.update());
             this.setEventListeners();

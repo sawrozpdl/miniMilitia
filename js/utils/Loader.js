@@ -12,8 +12,8 @@ export function loadAudio(url) {
     return new Promise (resolve => {
         var audio = new Audio(url);
         audio.addEventListener('loadeddata', () => {
-            //setTimeout(resolve, 3000, audio);
-            resolve(audio);
+            setTimeout(resolve, 2000, audio);
+            //resolve(audio);
         });
     });
 }

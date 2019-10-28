@@ -10,6 +10,7 @@ class Head extends BodyPart{
     }
 
     draw(context) { //OPT
+        this.spriteName = this.entity.spriteData + '-head';
         this.angle = this.entity.parts.lHand.angle / 4;
         this.sprite.rotate(this.spriteName,
              context, this.lPosition.x, this.lPosition.y,

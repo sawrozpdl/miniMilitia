@@ -46,6 +46,7 @@ class Hand extends BodyPart{
     }
 
     draw(context) { //OPT
+        this.spriteName = this.entity.spriteData + '-hand';
         var dy = (this.mouse.y - (this.gPosition.y % 1080));
         var dx = (this.mouse.x - (this.gPosition.x % 1920));
         this.angle = (this.entity.isFacingRight) ? Math.atan2(dy, dx) : -Math.atan(dy / dx);

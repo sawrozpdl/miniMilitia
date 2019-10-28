@@ -4,13 +4,14 @@ class Collision {
         this.game = game;
         this.rockPolygons = [];
         this.playerPolygons = [];
-        this.spans = [];
         this.guns = [];
+        this.powerUps = [];
         this.playerPolygons.push(game.player);
         this.mainPlayer = game.player;
         this.state = [];
         this.bullets = [];
         this.showDev = false;
+        this.timer = 0;
     }
 
 
@@ -22,15 +23,12 @@ class Collision {
         this.playerPolygons.push(player);
     }
 
-    pushSpan(span) {
-        this.spans.push(span);
-    }
 
-    canCollide(player, rock) {
-        return (player.position.x < (rock.position.x + rock.width) &&
-            (player.position.x + player.width) > rock.position.x &&
-            player.position.y < (rock.position.y + rock.height) &&
-            (player.position.y + player.height * 0.6) > rock.position.y);
+    canCollide(player, object) {
+        return (player.position.x < (object.position.x + object.width) &&
+            (player.position.x + player.width) > object.position.x &&
+            player.position.y < (object.position.y + object.height) &&
+            (player.position.y + player.height * 0.6) > object.position.y);
     }
 
     contains(point, vs) {
@@ -121,6 +119,23 @@ class Collision {
                 }
             });
 
+            var k = 0;
+            this.powerUps.forEach(powerUp => {
+                if (!powerUp.isActive) {
+                    this.powerUps.splice(k++,1);
+                }
+                else {
+                    powerUp.show();
+                    if (this.canCollide(this.mainPlayer, powerUp)) {
+                        this.game.player.pickPowerup(powerUp);
+                        this.game.playerScore += 20;
+                        this.game.audios.switch.play();
+                        powerUp.despawn();
+                    }
+                    k++;
+                }
+            });
+
             if (this.showDev) {
                 context.drawImage(temp, 0, 0);
                 temp2.width = temp2.width;
@@ -140,8 +155,29 @@ class Collision {
             
             this.setCollisionState();
 
-        }
+            if (this.game.botCount < 4) {
+                this.game.genBots();
+            }
+            if (this.timer > 45) {
+                let c = 0;
+                this.guns.forEach(gun => {
+                    if (!gun.hasBeenEquipped) {
+                        this.guns.splice(c, 1);
+                        c++;
+                    }
+                    else c++;
+                });
+                for (c = 0; c < this.powerUps.length; c++) {
+                    this.powerUps.splice(c, 1);
+                }
+                this.game.genGuns();
+                this.game.genPowerups();
+                this.timer = 0;
+            }
+            this.timer += (1 / this.game.FRAME_LIMIT);
+        }        
     }
+    
 }
 
 export default Collision;

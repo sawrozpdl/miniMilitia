@@ -15,6 +15,7 @@ import {
     loadJson,
     loadMedia
 } from './utils/Loader.js';
+import Powerup from './objects/Powerup.js';
 
 
 class Main {
@@ -44,8 +45,12 @@ class Main {
         this.gunCounter = 0;
         this.remLives = 3;
         this.gameScope = 3;
-        this.playerType = 'korean';
+        this.playerType = 'indian';
         this.playerKills = 0;
+        this.playerScore = 0;
+        this.botCount = 0;
+        this.hasLoaded = false;
+        this.gameStarted = false;
         this.mouse = {
             x: 0,
             y: 0
@@ -63,14 +68,12 @@ class Main {
     }
 
     spawnPlayer() {
-        this.player.position = new Vector(this.GAME_WIDTH * 0.8, this.GAME_HEIGHT * 0.2);
+        this.player.position = this.spawnPoints.players[Math.floor(Math.random() * this.spawnPoints.players.length)];
+        console.log(this.player.position);
         this.player.spawn();
-        var lgun = new Gun('uzi', this.sprite, this.gunData, this.collision);
-        var rgun = new Gun('uzi', this.sprite, this.gunData, this.collision);
+        var lgun = new Gun(((Math.random() < 0.5) ? 'uzi' : 'pistol'), this.sprite, this.gunData, this.collision);
         this.player.equip(lgun);
-        this.player.equip(rgun);
         this.guns.push(lgun);
-        this.guns.push(rgun);
         this.camera = new Camera(this);
         this.layers.push(this.player.draw());
     }
@@ -79,9 +82,20 @@ class Main {
         this.player.health = 100;
         this.player.thruster = 100;
         var lgun = new Gun('uzi', this.sprite, this.gunData, this.collision);
+        this.player.throwGuns();
         this.player.equip(lgun);
         this.guns.push(lgun);
+        this.player.position = this.spawnPoints.players[Math.floor(Math.random() * this.spawnPoints.players.length)];
+        this.playerType = 'indian';
         this.player.spawn();
+    }
+
+    drawLogo(logo, offset, context) {
+        context.drawImage(logo, 0, 0,
+            logo.width, logo.height,
+            (this.GAME_WIDTH - logo.width * 1.5) / 2,
+            ((this.GAME_HEIGHT - 2 * logo.height * 1.5) / 2) - offset,
+            logo.width * 1.5, logo.height * 1.5);
     }
 
     deployLoadingScreen() {
@@ -90,22 +104,30 @@ class Main {
         Promise.all([
             loadImage('../assets/images/background-main.png'),
             loadImage('../assets/images/loading.png'),
-            loadImage('../assets/images/logo.png')
-        ]).then(([background,loading, logo]) => {
+            loadImage('../assets/images/logo.png'),
+            loadImage('../assets/images/play.png')
+        ]).then(([background,loading, logo, play]) => {
             var i = 0;
+            var offset = 0;
             this.layers.push((context) => {
                 context.drawImage(background, 0, 0,
                     this.GAME_WIDTH, this.GAME_HEIGHT);
-                context.drawImage(logo, 0, 0,
-                    logo.width, logo.height,
-                    (this.GAME_WIDTH - logo.width * 1.5) / 2,
-                    (this.GAME_HEIGHT - 2 * logo.height * 1.5) / 2,
-                    logo.width * 1.5, logo.height * 1.5);
-                this.sprite.rotate(loading, context, (this.GAME_WIDTH - loading.width * 0.1) / 2,
-                (logo.height * 2 + loading.height) / 2, 0.1, i * Math.PI/180, {x : 1, y : 1});
-                i+=20;
+                this.drawLogo(logo, offset, context);
+                if (this.hasLoaded) {
+                    if (offset < 150) offset+=5;
+                    context.drawImage(play, (this.GAME_WIDTH - play.width) / 2, 300 + offset, 320, 188);
+                    this.playButton = {
+                        "x" : (this.GAME_WIDTH - play.width) / 2,
+                        "y" : 300 + offset,
+                        "width" : 320,
+                        "height" : 188
+                    }
+                }
+                else this.sprite.rotate(loading, context, (this.GAME_WIDTH - loading.width * 0.1) / 2,
+                (logo.height * 2 + loading.height) / 2, 0.1, i+=10 * Math.PI/180, {x : 1, y : 1});
+                //i+=20;
             });
-            this.animation.setFrameLimit(this.FRAME_LIMIT / 4);
+            this.animation.setFrameLimit(this.FRAME_LIMIT);
             this.startAnimation();
         });
     }
@@ -131,25 +153,49 @@ class Main {
             this.mainBuffer.height = this.map.getHeight();
             this.mainBuffer.width = this.map.getWidth();
             this.sprite.setMap(spriteMap);
-            this.dumpRecentScreen(); // which is loading screen
-            this.layers.setContext(this.context);
-            this.animation.setFrameLimit(this.FRAME_LIMIT);
-            this.init();
-            this.map.setCollisionLayer(this.collision);
-            this.launch();
+            this.hasLoaded = true;
         });
     }
 
+    startGame(e) {
+        var cx = e.clientX * this.GAME_WIDTH / window.screen.width;
+        var cy = e.clientY * this.GAME_HEIGHT / window.screen.height;
+        if (cx > this.playButton.x && cx < (this.playButton.x + this.playButton.width) &&
+            cy > this.playButton.y && cy < (this.playButton.y + this.playButton.height)) {
+                this.dumpRecentScreen(); // which is loading screen
+                this.layers.setContext(this.context);
+                this.animation.setFrameLimit(this.FRAME_LIMIT);
+                this.init();
+                this.map.setCollisionLayer(this.collision);
+                this.launch();
+            }
+    }
+
     genGuns() {
-        this.spawnPoints.forEach(point => {
+        this.spawnPoints.guns.forEach(point => {
+            if (Math.random() < 0.3) return; 
             var gun = new Gun(this.gunNames[Math.floor(Math.random() * this.gunNames.length)],
                          this.sprite, this.gunData, this.collision);
             gun.position.x = point.x;
             gun.position.y = point.y;
-            console.log(point);
             this.guns.push(gun);
         });
         this.collision.guns = this.guns;
+    }
+
+    genPowerups() {
+        var powerUps = ['korean', 'biker'];
+        var c = 1;
+        this.spawnPoints.powerups.forEach(pposition => {
+            let powerup = new Powerup(powerUps[c % 2], this.sprite, this.context);
+            powerup.position = pposition;
+            this.collision.powerUps.push(powerup);
+            c++;
+        });
+    }
+
+    genBots() {
+
     }
 
     despawnGuns() {
@@ -284,8 +330,8 @@ class Main {
         });
 
         this.MouseListener.for('mousemove', (e) => {
-            this.mouse.x = e.clientX;
-            this.mouse.y = e.clientY;
+            this.mouse.x = e.clientX * this.GAME_WIDTH / window.screen.width;
+            this.mouse.y = e.clientY * this.GAME_WIDTH / window.screen.height;
         });
 
         this.MouseListener.for('click', (e) => {
@@ -301,6 +347,7 @@ class Main {
             this.spawnPlayer();
             this.layers.push(this.map.drawBushes());
             this.genGuns();
+            this.genPowerups();
             this.layers.push(this.map.getCollisionLayer());
             this.layers.setCamera(this.camera.update());
             this.layers.setOverlay(this.overlay.show());

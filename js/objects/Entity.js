@@ -15,6 +15,7 @@ class Entity extends Polygon {
         this.position = position;
         this.scale = scale;
         this.audios = audios;
+        this.gravity = 0.3;
         this.parts = {
             head : new Head(this),
             lHand : new Hand(this, true),
@@ -30,15 +31,15 @@ class Entity extends Polygon {
         this.isKilled = false;
         this.thruster = 100;
         this.health = 100;
-        this.dthruster = 2.5;
+        this.dthruster = 1.5;
         this.isFacingRight = true;
         this.isWalking = false;
         this.isFlying = false;
         this.isShifted = false;
         this.hasLanded = false;
         this.isCrouching = false;
+        this.armourLevel = 1;
         this.velocity = new Vector(0, 0);
-        this.gravity = 0.3;
         this.cstate = [];
         this.height = (this.parts.head.getHeight() + 
                       this.parts.body.getHeight() +
@@ -102,6 +103,11 @@ class Entity extends Polygon {
             this.parts.rHand.throw();
         else if (this.parts.lHand.hasEquippedGun)
             this.parts.lHand.throw();
+    }
+
+    pickPowerup(powerUp) {
+        this.spriteData = powerUp.spriteName;
+        this.armourLevel = powerUp.armourLevel;
     }
 
     shoot() {
@@ -225,20 +231,16 @@ class Entity extends Polygon {
     }
 
     getShot(bullet) {
-        if (this.health <= bullet.damage) this.kill();
+        var damage = bullet.damage * (1 / this.armourLevel);
+        if (this.health <= damage) this.kill();
         else {
-            this.health -= bullet.damage;
+            this.health -= damage;
         }
     }
-
     
 
     kill() {
-        console.log('killed!');
-    }
-
-    reSpawn() {
-
+        this.isKilled = true;
     }
 
     draw() {
@@ -297,7 +299,8 @@ class Entity extends Polygon {
             }
             
             this.velocity.y += this.gravity;
-            this.position.add(this.velocity);
+            this.position.x += this.velocity.x;
+            this.position.y += this.velocity.y;
            
             if (this.isFlying) {
                 if (this.velocity.x > 0) this.rotationSpeed = 1;

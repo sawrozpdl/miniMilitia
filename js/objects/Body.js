@@ -6,7 +6,11 @@ class Body extends BodyPart{
         super(entity);
         this.spriteName = entity.spriteData + '-body';
         this.dimensions = this.sprite.getDim(this.spriteName);
-        console.log(this.dimensions);
+    }
+
+    draw(context) {
+        this.spriteName = this.entity.spriteData + '-body';
+        this.sprite.draw(this.spriteName, context, this.lPosition.x, this.lPosition.y, this.scale);
     }
 
 }

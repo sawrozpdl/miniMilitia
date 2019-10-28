@@ -10,7 +10,7 @@ class Leg extends BodyPart {
     }
 
     rotate(context, angle, crouch) {
-        
+        this.spriteName = this.entity.spriteData + '-leg';
         this.sprite.rotate(this.spriteName,
              context, this.lPosition.x + ((crouch) ? (10 + angle * 50) : 0), this.lPosition.y + ((crouch) ? 15 : 0), this.scale,
              (crouch) ? (Math.PI / 2) : angle,

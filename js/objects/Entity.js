@@ -75,27 +75,33 @@ class Entity extends Polygon {
     }
 
     equip(gun) {
-        if (gun) {
-            if (this.parts.lHand.hasEquippedGun && !this.parts.rHand.hasEquippedGun) {
-                if (this.parts.lHand.equippedGun.spriteName === gun.spriteName) {
-                    this.parts.rHand.equip(gun);
-                    gun.setOwner(this.parts.rHand);
-                    return;
-                }
+        if (this.parts.lHand.hasEquippedGun && !this.parts.rHand.hasEquippedGun) {
+            if (this.parts.lHand.equippedGun.spriteName === gun.spriteName) {
+                this.parts.rHand.equip(gun);
+                gun.setOwner(this.parts.rHand);
+                return;
             }
             else {
-                if (this.parts.lHand.hasEquippedGun) this.parts.lHand.throw();
+                this.parts.lHand.throw();
                 this.parts.lHand.equip(gun);
                 gun.setOwner(this.parts.lHand);
-            }
-        } 
-        else {
-            if (this.parts.rHand.hasEquippedGun)
-                this.parts.rHand.throw();
-            else if (this.parts.lHand.hasEquippedGun)
-                this.parts.lHand.throw();
+                return;
+            }   
         }
-        this.width = this.parts.body.getWidth() + this.parts.lHand.getWidth() / 1;
+        else {
+            if (this.parts.lHand.hasEquippedGun) this.parts.lHand.throw();
+            if (this.parts.rHand.hasEquippedGun) this.parts.rHand.throw();
+            this.parts.lHand.equip(gun);
+            gun.setOwner(this.parts.lHand);
+        }
+        this.width = this.parts.body.getWidth() + this.parts.lHand.getWidth();
+    }
+
+    throwGuns() {
+        if (this.parts.rHand.hasEquippedGun)
+            this.parts.rHand.throw();
+        else if (this.parts.lHand.hasEquippedGun)
+            this.parts.lHand.throw();
     }
 
     shoot() {

@@ -10,7 +10,6 @@ class Polygon {
         this.width = 0;
         this.height = 0;
         this.isPlayer = true;
-        this.lines = ["top", "right", "bottom", "left"];
     }
 
     updatePoints() { // for bots and players
@@ -94,16 +93,14 @@ class Polygon {
                 x1: this.points[i].x,
                 y1 : this.points[i].y,
                 x2 : this.points[i + 1].x,
-                y2 : this.points[i + 1].y,
-                i : (this.isPlayer) ? this.lines[i] : null
+                y2 : this.points[i + 1].y
             });
         }
         this.lineSegments.push({
             x1 : this.points[i].x,
             y1 : this.points[i].y,
             x2 : this.points[0].x,
-            y2 : this.points[0].y,
-            i : "left"
+            y2 : this.points[0].y
         });
     }
 

@@ -18,6 +18,7 @@ class Gun {
         this.scale = 0.25; // Default
         this.width = this.sprite.getDim(this.spriteName).width * this.scale;
         this.height = this.sprite.getDim(this.spriteName).height * this.scale;
+        this.timeout = 0;
         this.position = {
             x : undefined,
             y : undefined
@@ -58,9 +59,10 @@ class Gun {
     }
 
     shoot() {
-        if (this.liveAmmo == 0) return;
+        if (this.liveAmmo == 0 || this.timeout > 0) return;
         this.collision.bullets.push(new Bullet(this));
         this.sound.play();
+        this.timeout = this.data.recoil * 1000;
         this.liveAmmo--;
     }
     
@@ -112,6 +114,8 @@ class Gun {
                 x: 0,
                 y: 1
             });
+
+        if (this.timeout > 0) this.timeout -= 1000 / 60;
     }
 
     show(context) {

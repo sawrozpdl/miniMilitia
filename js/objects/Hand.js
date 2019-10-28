@@ -19,7 +19,9 @@ class Hand extends BodyPart{
     }
 
     getWidth() {
-        return this.dimensions.width + (this.hasEquippedGun) ? this.equippedGun.width * 0.5 : 0;
+        if (this.hasEquippedGun)
+            return (this.dimensions.width + this.equippedGun.width * 0.5);
+        return this.dimensions.width;
     }
 
     equip(gun) {

@@ -1,10 +1,10 @@
 {
     "ak47": {
         "damage": 8,
-        "recoil": 1,
+        "recoil": 0.4,
         "maxAmmo": 200,
         "maxLiveAmmo": 20,
-        "maxScope": 4,
+        "maxScope": 6,
         "scale" : 0.5,
         "holdingPoint": {
             "x": 0.5,
@@ -16,7 +16,7 @@
         "recoil": 0.5,
         "maxAmmo": 180,
         "maxLiveAmmo": 15,
-        "maxScope": 3,
+        "maxScope": 4,
         "scale" : 0.5,
         "holdingPoint": {
             "x": 0.5,
@@ -25,10 +25,10 @@
     },
     "uzi": {
         "damage": 5,
-        "recoil": 0.3,
+        "recoil": 0.1,
         "maxAmmo": 100,
         "maxLiveAmmo": 500,
-        "maxScope": 2,
+        "maxScope": 3,
         "scale" : 0.5,
         "holdingPoint": {
             "x": 0.5,
@@ -37,10 +37,10 @@
     },
     "pistol": {
         "damage": 10,
-        "recoil": 1.5,
+        "recoil": 1,
         "maxAmmo": 60,
         "maxLiveAmmo": 6,
-        "maxScope": 2,
+        "maxScope": 3,
         "scale" : 0.5,
         "holdingPoint": {
             "x": 0.5,

@@ -3,6 +3,11 @@
     padding: 0px;
 }
 
+@font-face {
+    font-family: 'militia';
+    src: url('../assets/fonts/militia.ttf');
+}
+
 body {
     overflow: hidden;
     background : black;

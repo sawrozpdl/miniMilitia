@@ -6,7 +6,6 @@ class Bullet {
         this.game = gun.collision.game;
         this.player = this.game.player;
         this.image = this.game.images.bullet;
-        this.recoil = this.gun.data.recoil;
         this.damage = this.gun.data.damage;
         this.faceRight = this.gun.hand.entity.isFacingRight;
         this.c = 0;
@@ -31,7 +30,7 @@ class Bullet {
         if (!this.hasHit) this.game.sprite.rotate(this.image, this.game.context,
             this.position.x, this.position.y,
             this.size, this.angle, {x : 0, y : 1});
-        this.c += this.recoil * 50;
+        this.c += 20;
     }
 }
 

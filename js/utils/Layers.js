@@ -14,6 +14,10 @@ class Layers {
         this.camera = camLayer;
     }
 
+    setOverlay(overlay) {
+        this.overlay = overlay;
+    }
+
     push(layer) {
         this.layers.push(layer); // layer should be pushed in the order it needs to be drawn
     }
@@ -28,8 +32,9 @@ class Layers {
         }); 
         if (this.camera)
             this.camera(this.context);
+        if (this.overlay)
+            this.overlay(); 
     }
-
     
 }
 

@@ -8,6 +8,7 @@ import Map from './objects/Map.js';
 import Collision from './objects/Collision.js';
 import Player from './objects/Player.js';
 import Gun from './objects/Gun.js';
+import Overlay from './objects/Overlay.js';
 import {Vector} from './utils/Math.js';
 import {
     loadImage,
@@ -41,14 +42,19 @@ class Main {
         this.guns = [];
         this.gunNames = ['uzi', 'ak47', 'm16', 'pistol'];
         this.gunCounter = 0;
+        this.remLives = 3;
+        this.gameScope = 3;
+        this.playerType = 'korean';
+        this.playerKills = 0;
         this.mouse = {
             x: 0,
             y: 0
         };
         this.canEquip = null;
-        this.player = new Player(this.sprite, 'indian',
+        this.player = new Player(this.sprite, this.playerType,
                 this.playerPosition, this.mouse, 0.5, this.audios);
         this.collision = new Collision(this);
+        this.overlay = new Overlay(this);
     }
 
     setDimensions() { 
@@ -67,6 +73,15 @@ class Main {
         this.guns.push(rgun);
         this.camera = new Camera(this);
         this.layers.push(this.player.draw());
+    }
+
+    respawnPlayer() {
+        this.player.health = 100;
+        this.player.thruster = 100;
+        var lgun = new Gun('uzi', this.sprite, this.gunData, this.collision);
+        this.player.equip(lgun);
+        this.guns.push(lgun);
+        this.player.spawn();
     }
 
     deployLoadingScreen() {
@@ -182,7 +197,18 @@ class Main {
         });
 
         this.keyListener.for(70, (down) => {
-            this.player.equip(this.canEquip);
+            if (this.canEquip) {
+                this.player.equip(this.canEquip);
+                this.camera.setScope(this.canEquip.scope);
+                this.gameScope = this.canEquip.scope;
+            }
+            else {
+                this.player.throwGuns();
+                if (!this.player.parts.rHand.hasEquippedGun) {
+                    this.camera.setScope(1.5);
+                    this.gameScope = 2;
+                }
+            }
         });
 
         this.keyListener.for(71, (down) => {
@@ -205,20 +231,50 @@ class Main {
             this.collision.showDev = !this.collision.showDev;
         });
 
-        this.keyListener.for(49, (down) => {
-            this.camera.setScope(1.5);
+        this.keyListener.for(49, (down) => { // 2x
+            if (this.player.parts.lHand.hasEquippedGun || this.player.parts.rHand.hasEquippedGun) 
+                this.camera.setScope(1.5);
+                this.gameScope = 2;
         });
 
-        this.keyListener.for(50, (down) => {
-            this.camera.setScope(2);
+        this.keyListener.for(50, (down) => { // 3x
+            if (this.player.parts.lHand.hasEquippedGun || this.player.parts.rHand.hasEquippedGun)
+                this.camera.setScope(2);
+                this.gameScope = 3;
         });
 
-        this.keyListener.for(51, (down) => {
-            this.camera.setScope(2.5);
+        this.keyListener.for(51, (down) => { // 4x
+            if (this.player.parts.lHand.hasEquippedGun) {
+                if (this.player.parts.lHand.equippedGun.data.maxScope > 3) {
+                    this.camera.setScope(2.5);
+                    this.gameScope = 4;
+                    return;
+                }
+                if (this.player.parts.rHand.hasEquippedGun) {
+                    if (this.player.parts.rHand.equippedGun.data.maxScope > 3) {
+                        this.camera.setScope(2.5);
+                        this.gameScope = 4;
+                        return;
+                    }
+                }
+            }
         });
 
-        this.keyListener.for(52, (down) => {
-            this.camera.setScope(3);
+        this.keyListener.for(52, (down) => { // 6x
+            if (this.player.parts.lHand.hasEquippedGun) {
+                if (this.player.parts.lHand.equippedGun.data.maxScope > 4) {
+                    this.camera.setScope(3);
+                    this.gameScope = 6;
+                    return;
+                }
+                if (this.player.parts.rHand.hasEquippedGun) {
+                    if (this.player.parts.rHand.equippedGun.data.maxScope > 4) {
+                        this.camera.setScope(3);
+                        this.gameScope = 6;
+                        return;
+                    }
+                }
+            }
         });
 
         this.keyListener.for(77, (down) => {
@@ -247,6 +303,7 @@ class Main {
             this.genGuns();
             this.layers.push(this.map.getCollisionLayer());
             this.layers.setCamera(this.camera.update());
+            this.layers.setOverlay(this.overlay.show());
             this.setEventListeners();
         });
     }

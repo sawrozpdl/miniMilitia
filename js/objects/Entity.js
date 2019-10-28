@@ -16,6 +16,7 @@ class Entity extends Polygon {
         this.scale = scale;
         this.audios = audios;
         this.gravity = 0.3;
+        this.cstate = [];
         this.parts = {
             head : new Head(this),
             lHand : new Hand(this, true),
@@ -25,6 +26,7 @@ class Entity extends Polygon {
             rLeg : new Leg(this, false)
         }
         this.mergeParts();
+        this.width = this.parts.body.getWidth() + this.parts.lHand.getWidth();
     }
 
     spawn() {
@@ -39,8 +41,8 @@ class Entity extends Polygon {
         this.hasLanded = false;
         this.isCrouching = false;
         this.armourLevel = 1;
-        this.velocity = new Vector(0, 0);
         this.cstate = [];
+        this.velocity = new Vector(0, 0);
         this.height = (this.parts.head.getHeight() + 
                       this.parts.body.getHeight() +
                       this.parts.lLeg.getHeight()) * 0.93; //parts are intersected
@@ -66,115 +68,6 @@ class Entity extends Polygon {
         this.audios.walk.playbackRate = 0.5;
         this.audios.jet.volume = 0.6;
         this.audios.walk.volume = 0.5;
-    }
-
-    pickAmmo(gun) {
-        if (this.parts.lHand.equippedGun.spriteName == gun.spriteName)
-            this.parts.lHand.equippedGun.pickAmmo(gun);
-        else if (this.parts.rHand.equippedGun.spriteName == gun.spriteName)
-            this.parts.rHand.equippedGun.pickAmmo(gun);
-    }
-
-    equip(gun) {
-        if (this.parts.lHand.hasEquippedGun && !this.parts.rHand.hasEquippedGun) {
-            if (this.parts.lHand.equippedGun.spriteName === gun.spriteName) {
-                this.parts.rHand.equip(gun);
-                gun.setOwner(this.parts.rHand);
-                return;
-            }
-            else {
-                this.parts.lHand.throw();
-                this.parts.lHand.equip(gun);
-                gun.setOwner(this.parts.lHand);
-                return;
-            }   
-        }
-        else {
-            if (this.parts.lHand.hasEquippedGun) this.parts.lHand.throw();
-            if (this.parts.rHand.hasEquippedGun) this.parts.rHand.throw();
-            this.parts.lHand.equip(gun);
-            gun.setOwner(this.parts.lHand);
-        }
-        this.width = this.parts.body.getWidth() + this.parts.lHand.getWidth();
-    }
-
-    throwGuns() {
-        if (this.parts.rHand.hasEquippedGun)
-            this.parts.rHand.throw();
-        else if (this.parts.lHand.hasEquippedGun)
-            this.parts.lHand.throw();
-    }
-
-    pickPowerup(powerUp) {
-        this.spriteData = powerUp.spriteName;
-        this.armourLevel = powerUp.armourLevel;
-    }
-
-    shoot() {
-        this.parts.lHand.shoot();
-        this.parts.rHand.shoot();
-    }
-
-    reload() {
-        this.parts.lHand.reload();
-        this.parts.rHand.reload();
-    }
-
-    crouch() {
-        this.isCrouching = true;
-    }
-
-    unCrouch() {
-        this.isCrouching = false;
-        this.position.y -= 10;
-    }
-
-    moveLeft() {
-        if (this.hasRockLeft()) {
-            this.stopWalking();
-            return;
-        }
-        this.isWalking = true;
-        if (this.hasRockBelow() && this.canClimbLeft()) {
-            this.position.y -= 1;
-            this.position.x -= 1;
-            return;
-        }
-        this.velocity.x = -2;
-    }
-
-    moveRight() {
-        if (this.hasRockRight()) {
-            this.stopWalking();
-            return;
-        }
-        this.isWalking = true;
-        if (this.hasRockBelow() && this.canClimbRight()) {
-            this.position.y -= 1;
-            this.position.x += 1;
-            return;
-        }
-        this.velocity.x = 2;
-    }
-
-    stopWalking() {
-        this.isWalking = false;
-        this.velocity.x = 0;
-    }
-
-    flyUp() {
-        if (this.hasRockAbove() || this.thruster <= 0) {
-            this.stopFlying();
-            return;
-        }
-        this.isFlying = true;
-        this.velocity.y = -4; //fix this
-        this.thruster -= this.dthruster;
-    }
-
-    stopFlying() {
-        this.isFlying = false;
-        this.velocity.y = 0;
     }
 
     hasRockBelow() {
@@ -230,6 +123,66 @@ class Entity extends Polygon {
         }
     }
 
+    shoot() {
+        this.parts.lHand.shoot();
+        this.parts.rHand.shoot();
+    }
+
+    reload() {
+        this.parts.lHand.reload();
+        this.parts.rHand.reload();
+    }
+
+
+
+    moveLeft() {
+        if (this.hasRockLeft()) {
+            this.stopWalking();
+            return;
+        }
+        this.isWalking = true;
+        if (this.hasRockBelow() && this.canClimbLeft()) {
+            this.position.y -= 1;
+            this.position.x -= 1;
+            return;
+        }
+        this.velocity.x = -2;
+    }
+
+    moveRight() {
+        if (this.hasRockRight()) {
+            this.stopWalking();
+            return;
+        }
+        this.isWalking = true;
+        if (this.hasRockBelow() && this.canClimbRight()) {
+            this.position.y -= 1;
+            this.position.x += 1;
+            return;
+        }
+        this.velocity.x = 2;
+    }
+
+    stopWalking() {
+        this.isWalking = false;
+        this.velocity.x = 0;
+    }
+
+    flyUp() {
+        if (this.hasRockAbove() || this.thruster <= 0) {
+            this.stopFlying();
+            return;
+        }
+        this.isFlying = true;
+        this.velocity.y = -4; //fix this
+        this.thruster -= this.dthruster;
+    }
+
+    stopFlying() {
+        this.isFlying = false;
+        this.velocity.y = 0;
+    }
+
     getShot(bullet) {
         var damage = bullet.damage * (1 / this.armourLevel);
         if (this.health <= damage) this.kill();
@@ -241,6 +194,12 @@ class Entity extends Polygon {
 
     kill() {
         this.isKilled = true;
+        this.throwGuns();
+        this.die();
+    }
+
+    die() { // different for both player and bot so define in sub class
+
     }
 
     draw() {
@@ -250,7 +209,6 @@ class Entity extends Polygon {
         var bufferCtx = buffer.getContext('2d');
         buffer.fillstyle = 'green'; //  REMOVE
         bufferCtx.fillRect(0,0,buffer.width, buffer.height); // REMOVE
-
         this.updatePoints();
 
         return (context) => {

@@ -9,13 +9,13 @@ import Collision from './objects/Collision.js';
 import Player from './objects/Player.js';
 import Gun from './objects/Gun.js';
 import Overlay from './objects/Overlay.js';
-import {Vector} from './utils/Math.js';
 import {
     loadImage,
     loadJson,
     loadMedia
 } from './utils/Loader.js';
 import Powerup from './objects/Powerup.js';
+import Robot from './objects/Robot.js';
 
 
 class Main {
@@ -29,17 +29,21 @@ class Main {
         this.FRAME_LIMIT = 60;
         
         this.robots = [];
+        this.playButton = {
+            x : 0,
+            y : 0
+        }
         this.mainContext = this.canvas.getContext('2d');
         this.mainBuffer = document.createElement('canvas');
         this.context = this.mainBuffer.getContext('2d');
         this.sprite = new Sprite();
         this.layers = new Layers(this.context);
         this.animation = new Animator(this.FRAME_LIMIT);
+        this.keyListener = new Keyboard();
+        this.MouseListener = new Mouse(this.canvas);
     }
 
     init() {
-        this.keyListener = new Keyboard();
-        this.MouseListener = new Mouse(this.canvas);
         this.guns = [];
         this.gunNames = ['uzi', 'ak47', 'm16', 'pistol'];
         this.gunCounter = 0;
@@ -48,7 +52,7 @@ class Main {
         this.playerType = 'indian';
         this.playerKills = 0;
         this.playerScore = 0;
-        this.botCount = 0;
+        this.botCount = 5;
         this.hasLoaded = false;
         this.gameStarted = false;
         this.mouse = {
@@ -168,6 +172,7 @@ class Main {
                 this.init();
                 this.map.setCollisionLayer(this.collision);
                 this.launch();
+                this.gameStarted = true;
             }
     }
 
@@ -195,7 +200,17 @@ class Main {
     }
 
     genBots() {
-
+        var bot = new Robot(this.sprite, this.spawnPoints.players[6], this.MouseListener, 0.5, this.audios);
+        var gun = new Gun(this.gunNames[Math.floor(Math.random() * this.gunNames.length)],
+                         this.sprite, this.gunData, this.collision);
+        gun.liveAmmo = 500;
+        this.guns.push(gun);
+        bot.parts.lHand.equip(gun);
+        bot.setEnemy(this.player);
+        gun.setOwner(bot.parts.lHand);
+        bot.init();
+        this.collision.playerPolygons.push(bot);
+        this.layers.push(bot.draw());
     }
 
     despawnGuns() {
@@ -346,6 +361,7 @@ class Main {
             this.layers.push(this.map.drawForeground());
             this.spawnPlayer();
             this.layers.push(this.map.drawBushes());
+            this.genBots();
             this.genGuns();
             this.genPowerups();
             this.layers.push(this.map.getCollisionLayer());

@@ -14,10 +14,6 @@ class Hand extends BodyPart{
         this.angle = 0;
     }
 
-    punch() {
-
-    }
-
     getWidth() {
         if (this.hasEquippedGun)
             return (this.dimensions.width + this.equippedGun.width * 0.5);
@@ -47,8 +43,8 @@ class Hand extends BodyPart{
 
     draw(context) { //OPT
         this.spriteName = this.entity.spriteData + '-hand';
-        var dy = (this.mouse.y - (this.gPosition.y % 1080));
-        var dx = (this.mouse.x - (this.gPosition.x % 1920));
+        var dy = (this.mouse.y - (this.gPosition.y % window.screen.height));
+        var dx = (this.mouse.x - (this.gPosition.x % window.screen.width));
         this.angle = (this.entity.isFacingRight) ? Math.atan2(dy, dx) : -Math.atan(dy / dx);
         if (this.hasEquippedGun) this.equippedGun.draw(context);
         this.sprite.rotate(this.spriteName,

@@ -1,6 +1,7 @@
 import Sprite from './utils/Sprite.js';
 import Animator from './utils/Animator.js';
 import Layers from './utils/Layers.js';
+import {genRandom} from './utils/Math.js';
 import Keyboard from './events/Keyboard.js';
 import Mouse from './events/Mouse.js';
 import Camera from './utils/Camera.js';
@@ -52,7 +53,7 @@ class Main {
         this.playerType = 'indian';
         this.playerKills = 0;
         this.playerScore = 0;
-        this.botCount = 5;
+        this.botCount = 0;
         this.hasLoaded = false;
         this.gameStarted = false;
         this.mouse = {
@@ -72,7 +73,11 @@ class Main {
     }
 
     spawnPlayer() {
-        this.player.position = this.spawnPoints.players[Math.floor(Math.random() * this.spawnPoints.players.length)];
+        var pos = this.spawnPoints.players[Math.floor(Math.random() * this.spawnPoints.players.length)];
+        this.player.position = {
+            x : pos.x + 0,
+            y : pos.y + 0
+        }
         console.log(this.player.position);
         this.player.spawn();
         var lgun = new Gun(((Math.random() < 0.5) ? 'uzi' : 'pistol'), this.sprite, this.gunData, this.collision);
@@ -89,9 +94,13 @@ class Main {
         this.player.throwGuns();
         this.player.equip(lgun);
         this.guns.push(lgun);
-        this.player.position = this.spawnPoints.players[Math.floor(Math.random() * this.spawnPoints.players.length)];
+        var pos = this.spawnPoints.players[Math.floor(Math.random() * this.spawnPoints.players.length)];
+        this.player.position.x = pos.x + 0;
+        this.player.position.y = pos.y + 0;
         this.playerType = 'indian';
         this.player.spawn();
+        console.log('respawned!');
+        this.gameStarted = true;
     }
 
     drawLogo(logo, offset, context) {
@@ -181,8 +190,8 @@ class Main {
             if (Math.random() < 0.3) return; 
             var gun = new Gun(this.gunNames[Math.floor(Math.random() * this.gunNames.length)],
                          this.sprite, this.gunData, this.collision);
-            gun.position.x = point.x;
-            gun.position.y = point.y;
+            gun.position.x = point.x + 0;
+            gun.position.y = point.y + 0;
             this.guns.push(gun);
         });
         this.collision.guns = this.guns;
@@ -193,24 +202,37 @@ class Main {
         var c = 1;
         this.spawnPoints.powerups.forEach(pposition => {
             let powerup = new Powerup(powerUps[c % 2], this.sprite, this.context);
-            powerup.position = pposition;
+            powerup.position = {
+                x : pposition.x,
+                y : pposition.y
+            }
             this.collision.powerUps.push(powerup);
             c++;
         });
     }
 
     genBots() {
-        var bot = new Robot(this.sprite, this.spawnPoints.players[6], this.MouseListener, 0.5, this.audios);
-        var gun = new Gun(this.gunNames[Math.floor(Math.random() * this.gunNames.length)],
-                         this.sprite, this.gunData, this.collision);
-        gun.liveAmmo = 500;
-        this.guns.push(gun);
-        bot.parts.lHand.equip(gun);
-        bot.setEnemy(this.player);
-        gun.setOwner(bot.parts.lHand);
-        bot.init();
-        this.collision.playerPolygons.push(bot);
-        this.layers.push(bot.draw());
+        this.spawnPoints.players.forEach(ppoint => {
+            if (Math.random() < 0.1) {
+                var bot = new Robot(this.sprite, undefined, this.MouseListener, 0.5, this.audios, genRandom(1, 4));
+                var gun = new Gun(this.gunNames[Math.floor(Math.random() * this.gunNames.length)],
+                                this.sprite, this.gunData, this.collision);
+                bot.position = {
+                    x : ppoint.x + 0,
+                    y : ppoint.y + 0
+                }
+                gun.liveAmmo = 1000;
+                this.guns.push(gun);
+                bot.parts.lHand.equip(gun);
+                bot.setEnemy(this.player);
+                gun.setOwner(bot.parts.lHand);
+                bot.init();
+                this.collision.playerPolygons.push(bot);
+                this.layers.push(bot.draw());
+                this.botCount++;
+                if (this.botCount >= 3) return;
+            }
+        });
     }
 
     despawnGuns() {
@@ -345,8 +367,8 @@ class Main {
         });
 
         this.MouseListener.for('mousemove', (e) => {
-            this.mouse.x = e.clientX * this.GAME_WIDTH / window.screen.width;
-            this.mouse.y = e.clientY * this.GAME_WIDTH / window.screen.height;
+            this.mouse.x = e.clientX;
+            this.mouse.y = e.clientY;
         });
 
         this.MouseListener.for('click', (e) => {
@@ -361,13 +383,13 @@ class Main {
             this.layers.push(this.map.drawForeground());
             this.spawnPlayer();
             this.layers.push(this.map.drawBushes());
-            this.genBots();
             this.genGuns();
             this.genPowerups();
             this.layers.push(this.map.getCollisionLayer());
             this.layers.setCamera(this.camera.update());
             this.layers.setOverlay(this.overlay.show());
             this.setEventListeners();
+            window.game = this;
         });
     }
 }

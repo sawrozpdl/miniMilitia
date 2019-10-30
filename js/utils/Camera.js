@@ -64,14 +64,12 @@ class Camera {
                 0, 0, this.width, this.height
             );
             this.game.mainContext.drawImage(this.visible, 0, 0, this.width, this.height);
-            //context.fillRect(this.game.player.position.x, this.game.player.position.y, this.game.player.width, this.game.player.height);
             context.strokeStyle = 'white';
             context.lineWidth = 20;
             context.strokeRect(0, 0, this.game.mainBuffer.width, this.game.mainBuffer.height);
-            context.drawImage(this.game.images.arrowDown, this.game.player.position.x, this.game.player.position.y - 150, 100, 100);
-            this.game.robots.forEach(robot => {
-                context.drawImage(this.game.images.arrowDownRed,
-                             robot.position.x, robot.position.y - 150, 100, 100);
+            this.game.collision.playerPolygons.forEach(player => {
+                context.drawImage((player.isBot) ? this.game.images.arrowDownRed : this.game.images.arrowDown,
+                                   player.position.x + 5, player.position.y - 140, 100, 100);
             });
             if (this.map) {
                 this.game.mainContext.fillStyle = 'rgba(0, 0, 0, 0.5)';

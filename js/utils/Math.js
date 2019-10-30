@@ -15,3 +15,7 @@ export class Vector {
         this.y *= -1;
     }
 } 
+
+export function genRandom(min, max) {
+    return Math.floor(Math.random(max - min)) + min;
+}

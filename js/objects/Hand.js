@@ -45,6 +45,10 @@ class Hand extends BodyPart{
         this.spriteName = this.entity.spriteData + '-hand';
         var dy = (this.mouse.y - (this.gPosition.y % window.screen.height));
         var dx = (this.mouse.x - (this.gPosition.x % window.screen.width));
+        if (this.entity.isBot) {
+            dx =  this.entity.enemy.position.x - this.gPosition.x;
+            dy = this.entity.enemy.position.y - this.gPosition.y;
+        }
         this.angle = (this.entity.isFacingRight) ? Math.atan2(dy, dx) : -Math.atan(dy / dx);
         if (this.hasEquippedGun) this.equippedGun.draw(context);
         this.sprite.rotate(this.spriteName,

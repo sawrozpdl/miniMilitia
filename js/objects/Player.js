@@ -4,8 +4,8 @@ class Player extends Entity {
 
     constructor(sprite, spriteData, position, mouse, scale, audio) {
         super(sprite, spriteData, position, mouse, scale, audio);
-
-        this.health = super.health * 2;
+        this.maxHealth = super.maxHealth * 3;
+        this.health = super.health * 3;
         this.isBot =  false;
     }
     
@@ -45,13 +45,6 @@ class Player extends Entity {
         this.armourLevel = powerUp.armourLevel;
     }
 
-    throwGuns() {
-        if (this.parts.rHand.hasEquippedGun)
-            this.parts.rHand.throw();
-        else if (this.parts.lHand.hasEquippedGun)
-            this.parts.lHand.throw();
-    }
-
     crouch() {
         this.isCrouching = true;
     }
@@ -59,6 +52,52 @@ class Player extends Entity {
     unCrouch() {
         this.isCrouching = false;
         this.position.y -= 10;
+    }
+
+    resolveCollisions() {
+        if (this.cstate.includes(1) && this.cstate.includes(7)) {
+            this.position.x += 3;
+            this.position.y += 3;
+        }
+        if (this.cstate.includes(1) && this.cstate.includes(3)) {
+            this.position.x -= 3;
+            this.position.y += 3;
+        }
+        if (this.cstate.includes(5) && !this.isCrouching && (this.cstate.includes(6.5) || this.cstate.includes(3.5))) {
+            this.position.y -= 1;
+        }
+        if (this.hasRockAbove()) {
+            this.position.y += 1;
+        }
+        if ((this.cstate.includes(3.5) && this.cstate.includes(6.5)) && this.hasRockBelow()) {
+            this.position.y -= 1;
+        }
+    }
+
+    die() {
+        // TODO
+    }
+
+    draw() {
+        var defaultCallback = super.draw();
+        return (context) => {
+            this.isFacingRight = (this.position.x % window.screen.width) < this.mouse.x;
+            this.resolveCollisions();
+            defaultCallback(context);
+            if (this.isFlying) {
+                if (this.velocity.x > 0) this.rotationSpeed = 1;
+                if (this.velocity.x < 0) this.rotationSpeed = -1;
+                if (this.rotation > this.maxRotation) this.rotation = this.maxRotation;
+                if (this.rotation < -this.maxRotation) this.rotation = -this.maxRotation;
+            }
+            if (!this.isFlying) {  // go back smoothly
+                if (this.rotation < 0) this.rotationSpeed = 1;
+                if (this.rotation > 0) this.rotationSpeed = -1;
+                if (this.rotation == 0) this.rotationSpeed = 0;
+            }
+        
+            this.rotation += this.rotationSpeed;
+        }
     }
 
     

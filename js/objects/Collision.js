@@ -31,36 +31,50 @@ class Collision {
             (player.position.y + player.height * 0.6) > object.position.y);
     }
 
-    contains(point, vs) {
-        var x = point.x, y = point.y;
-    
-        var inside = false;
-        for (var i = 0, j = vs.length - 1; i < vs.length; j = i++) {
-            var xi = vs[i].x, yi = vs[i].y;
-            var xj = vs[j].x, yj = vs[j].y;
-    
-            var intersect = ((yi > y) != (yj > y))
-                && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
-            if (intersect) inside = !inside;
+    contains(point, points) {
+        var x = point.x;
+        var y = point.y;
+        var isInside = false;
+        var x1, y1, x2, y2;
+        for (var i = 0, j = points.length - 1; i < points.length; j = i++) {
+            x1 = points[i].x,
+            y1 = points[i].y;
+            x2 = points[j].x,
+            y2 = points[j].y;
+            // we need only the required lines to check # y - y1 = M (x - x1)
+            if ((y1 > y) != (y2 > y) && (x < (x2 - x1) * (y - y1) / (y2 - y1) + x1))
+                 isInside = !isInside;
         }
-    
-        return inside;
+        return isInside;
     }
 
     setCollisionState() {
+        var c = 0;
         this.playerPolygons.forEach(player => {
-            this.state = [];
-            this.rockPolygons.forEach(rock => {
-                if (this.canCollide(player, rock)) {  
-                    player.points.forEach(point => {
-                        if (this.contains(point, rock.points))
-                            this.state.push(point.i);
-                    });
-                    //console.log(this.state);
-                    player.cstate = this.state;
-                    return;
-                }
-            });
+            if (!player.isKilled) {
+                this.state = [];
+                this.rockPolygons.forEach(rock => {
+                    if (this.canCollide(player, rock)) {
+                        player.points.forEach(point => {
+                            if (this.contains(point, rock.points))
+                                this.state.push(point.i);
+                        });
+                        // console.log(this.state);
+                        player.cstate = this.state;
+                    }
+                });
+                c++;
+            } else if (player.isBot) {
+                this.playerPolygons.splice(c, 1);
+                this.game.botCount--;
+                this.game.playerKills++;
+                this.game.playerScore += 20;
+                c++;
+            } else if (this.game.gameStarted){
+                this.game.remLives--;
+                this.game.gameStarted = false;
+            }
+            console.log(this.playerPolygons);
         });
     }
 
@@ -71,27 +85,28 @@ class Collision {
         var temp2 = document.createElement('canvas');
         var cty2 = temp2.getContext('2d');
         temp.width = this.game.mainBuffer.width;
-            temp.height = this.game.mainBuffer.height;
-            cty.strokeStyle = "#FF0000";
-            this.rockPolygons.forEach(rock => {
+        temp.height = this.game.mainBuffer.height;
+        cty.strokeStyle = "#FF0000";
+        this.rockPolygons.forEach(rock => {
 
-                cty.moveTo(rock.points[0].x, rock.points[0].y);
-                rock.points.forEach(point => {
-                    cty.lineTo(point.x, point.y);
-                    cty.stroke();
-                });
-                cty.closePath();
+            cty.moveTo(rock.points[0].x, rock.points[0].y);
+            rock.points.forEach(point => {
+                cty.lineTo(point.x, point.y);
                 cty.stroke();
-            })
-            temp2.width = this.game.mainBuffer.width;
-            temp2.height = this.game.mainBuffer.height;
+            });
+            cty.closePath();
+            cty.stroke();
+        })
+        temp2.width = this.game.mainBuffer.width;
+        temp2.height = this.game.mainBuffer.height;
 
-        return (context) => { 
+        return (context) => {
             var i = 0;
             this.bullets.forEach(bullet => {
                 bullet.update();
                 this.playerPolygons.forEach(player => {
                     if (player == bullet.player) return;
+                    else if (bullet.player.isBot && player.isBot) return;
                     if (this.canCollide(player, bullet)) {
                         bullet.hasHit = true;
                         player.getShot(bullet);
@@ -102,7 +117,6 @@ class Collision {
                         if (this.contains(bullet.position, rock.points)) { // OPT
                             bullet.hasHit = true;
                         }
-                            
                     }
                 });
                 if (bullet.hasHit) this.bullets.splice(i, 1);
@@ -122,9 +136,8 @@ class Collision {
             var k = 0;
             this.powerUps.forEach(powerUp => {
                 if (!powerUp.isActive) {
-                    this.powerUps.splice(k++,1);
-                }
-                else {
+                    this.powerUps.splice(k++, 1);
+                } else {
                     powerUp.show();
                     if (this.canCollide(this.mainPlayer, powerUp)) {
                         this.game.player.pickPowerup(powerUp);
@@ -149,14 +162,16 @@ class Collision {
                     cty2.closePath();
                     cty2.stroke();
                     context.drawImage(temp2, 0, 0);
-                    cty2.clearRect(0, 0, temp2.width, temp2.height);  
+                    cty2.clearRect(0, 0, temp2.width, temp2.height);
                 });
             }
-            
+
             this.setCollisionState();
 
-            if (this.game.botCount < 4) {
-                this.game.genBots();
+            if (!(this.timer % 15)) {
+                if (this.game.botCount < 3) {
+                    this.game.genBots();
+                }
             }
             if (this.timer > 45) {
                 let c = 0;
@@ -164,8 +179,7 @@ class Collision {
                     if (!gun.hasBeenEquipped) {
                         this.guns.splice(c, 1);
                         c++;
-                    }
-                    else c++;
+                    } else c++;
                 });
                 for (c = 0; c < this.powerUps.length; c++) {
                     this.powerUps.splice(c, 1);
@@ -175,9 +189,9 @@ class Collision {
                 this.timer = 0;
             }
             this.timer += (1 / this.game.FRAME_LIMIT);
-        }        
+        }
     }
-    
+
 }
 
 export default Collision;

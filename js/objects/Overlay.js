@@ -10,13 +10,15 @@ class Overlay {
         this.rHand = game.player.parts.rHand;
         this.context.strokeStyle = 'white';
         this.context.lineWidth = 3;
+
+        this.timer = 0;
     }
 
     drawHealth() {
         this.sprite.draw('health', this.context, 50, 50, 0.7);
         this.context.strokeRect(135, 70, 300, 20);
         this.context.fillStyle = '#7676FF';
-        this.context.fillRect(137, 72, 296 * (this.player.health / 100), 16); 
+        this.context.fillRect(137, 72, 296 * (this.player.health / this.player.maxHealth), 16); 
     }
 
     drawThruster() {
@@ -36,12 +38,14 @@ class Overlay {
         this.context.font = '15px militia';
         if (this.lHand.equippedGun) {
             this.sprite.draw(this.lHand.equippedGun.spriteName, this.context,  655, 80, 0.6);
-            this.context.fillText(this.lHand.equippedGun.liveAmmo, 620, 150);
+            if (this.lHand.equippedGun.isReloading) this.context.fillText((Math.random() < 0.5) ? "+" : "x", 620, 150);
+            else this.context.fillText(this.lHand.equippedGun.liveAmmo, 620, 150);
             this.context.fillText(this.lHand.equippedGun.ammo, 740, 150);
         }
         if (this.rHand.equippedGun) {
             this.sprite.draw(this.rHand.equippedGun.spriteName, this.context, 865, 80, 0.6);
-            this.context.fillText(this.rHand.equippedGun.liveAmmo, 835, 150);
+            if (this.rHand.equippedGun.isReloading) this.context.fillText((Math.random() < 0.5) ? "+" : "x", 835, 150);
+            else this.context.fillText(this.rHand.equippedGun.liveAmmo, 835, 150);
             this.context.fillText(this.rHand.equippedGun.ammo, 955, 150);
         }   
     }
@@ -62,26 +66,37 @@ class Overlay {
     }
 
     showGameOver() {
-
+        console.log('Game Over');
     }
 
     requestRespawn() {
         this.game.respawnPlayer();
     }
 
+    nextLife() {
+        this.timer += (1 / 60);
+        console.log('respawning in ', 5 - this.timer);
+        if (this.timer < 5) return;
+        else {
+            this.requestRespawn();
+            this.timer = 0;
+        }
+    }
 
     show() {
         return () => {
             if (!this.game.gameOver) {
-                if (!this.game.player.hasDied) {
+                if (this.game.gameStarted) {
                     this.drawHealth();
                     this.drawThruster();
                     this.drawGun();
                     this.drawStatus();
                 }
                 else {
-                    if (this.game.numLives == 0) this.showGameOver();
-                    else this.requestRespawn();
+                    if (this.game.remLives == 0) this.showGameOver();
+                    else {
+                        this.nextLife();
+                    }
                 }
             }
             else {

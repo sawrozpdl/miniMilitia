@@ -32,8 +32,10 @@ class Entity extends Polygon {
     spawn() {
         this.isKilled = false;
         this.thruster = 100;
+        this.maxHealth = 100;
         this.health = 100;
-        this.dthruster = 1.5;
+        this.dhealth = 0.01;
+        this.dthruster = 1;
         this.isFacingRight = true;
         this.isWalking = false;
         this.isFlying = false;
@@ -93,34 +95,17 @@ class Entity extends Polygon {
     }
 
     canClimbLeft() {
-        return (this.cstate.includes(6) && !this.cstate.includes(7) && !this.cstate.includes(0));
+        return (this.cstate.includes(6) && this.cstate.includes(6.5) && 
+                            !this.cstate.includes(7) &&
+                            !this.cstate.includes(0) &&
+                            !this.hasRockAbove());
     }
 
     canClimbRight() {
-        return (this.cstate.includes(4) && !this.cstate.includes(2) && !this.cstate.includes(3));
-    }
-    
-    checkCols() {
-        if (this.cstate.includes(2) && this.cstate.includes(7)) {
-            this.position.x += 3;
-            this.position.y += 3;
-        }
-        if (this.cstate.includes(2) && this.cstate.includes(3)) {
-            this.position.x -= 3;
-            this.position.y += 3;
-        }
-        if (this.cstate.includes(5) && this.cstate.includes(7)) {
-            this.position.x += 3;
-            this.position.y -= 3;
-        }
-        if (this.cstate.includes(5) && this.cstate.includes(3)) {
-            this.position.x -= 3;
-            this.position.y -= 3;
-        }
-        if ((this.cstate.includes(0) && this.cstate.includes(2)) ||
-        (this.cstate.includes(1) && this.cstate.includes(2)) || (this.cstate.includes(0) && this.cstate.includes(3))) {
-            this.position.y += 3;
-        }
+        return (this.cstate.includes(4) && this.cstate.includes(3.5) &&
+                            !this.cstate.includes(2) &&
+                            !this.cstate.includes(3) &&
+                            !this.hasRockAbove());
     }
 
     shoot() {
@@ -133,15 +118,13 @@ class Entity extends Polygon {
         this.parts.rHand.reload();
     }
 
-
-
     moveLeft() {
         if (this.hasRockLeft()) {
             this.stopWalking();
             return;
         }
         this.isWalking = true;
-        if (this.hasRockBelow() && this.canClimbLeft()) {
+        if (this.canClimbLeft()) {
             this.position.y -= 1;
             this.position.x -= 1;
             return;
@@ -155,7 +138,7 @@ class Entity extends Polygon {
             return;
         }
         this.isWalking = true;
-        if (this.hasRockBelow() && this.canClimbRight()) {
+        if (this.canClimbRight()) {
             this.position.y -= 1;
             this.position.x += 1;
             return;
@@ -166,6 +149,13 @@ class Entity extends Polygon {
     stopWalking() {
         this.isWalking = false;
         this.velocity.x = 0;
+    }
+
+    throwGuns() {
+        if (this.parts.rHand.hasEquippedGun)
+            this.parts.rHand.throw();
+        else if (this.parts.lHand.hasEquippedGun)
+            this.parts.lHand.throw();
     }
 
     flyUp() {
@@ -194,7 +184,6 @@ class Entity extends Polygon {
 
     kill() {
         this.isKilled = true;
-        this.throwGuns();
         this.die();
     }
 
@@ -202,18 +191,76 @@ class Entity extends Polygon {
 
     }
 
+    updatePoints() { // for bots and players
+        if (!this.isPlayer) return; //static rocks dont need update
+        var offSetX = ((!this.isFacingRight) ? this.width * 0.35 / 2 : 0);
+        var offSetY = (this.isCrouching) ? -10 : 0;
+        //var angOffset = this.rotation * this.width * 0.005;
+        this.points = [
+            {
+                x : this.position.x + offSetX,
+                y : this.position.y,
+                i : 0
+            }, 
+            {
+                x : this.position.x + (offSetX + this.width * 0.15) / 2,
+                y : this.position.y,
+                i : 1
+            }, 
+            {
+                x : this.position.x + offSetX + this.width * 0.15,
+                y : this.position.y,
+                i : 2
+            },
+            {
+                x : this.position.x + offSetX + this.width * 0.15, //
+                y : this.position.y + (this.height * 0.25) / 2,
+                i : 3
+            },
+            {
+                x : this.position.x + offSetX + this.width * 0.15, 
+                y : this.position.y + (this.height * 0.25) - 7,
+                i : 3.5
+            },
+            {
+                x : this.position.x + offSetX + this.width * 0.15,
+                y : this.position.y + offSetY + this.height * 0.25,
+                i : 4
+            },
+            {
+                x : this.position.x + offSetX + this.width * 0.15 / 2,
+                y : this.position.y + offSetY + this.height * 0.25,
+                i : 5
+            },
+            {
+                x : this.position.x + offSetX,
+                y : this.position.y + offSetY + this.height * 0.25,
+                i : 6
+            },
+            {
+                x : this.position.x + offSetX,
+                y : this.position.y + offSetY + (this.height * 0.25) - 7, 
+                i : 6.5
+            },
+            {
+                x : this.position.x + offSetX,
+                y : this.position.y + offSetY + (this.height * 0.25) / 2, //
+                i : 7
+            }
+        ];
+        //this.lineSegments = [];
+        //this.setLineSegments();
+    }
+
+
     draw() {
         let buffer = document.createElement('canvas');
         buffer.height = this.height * this.scale * 1.5;
         buffer.width = this.width * this.scale * 1.5;
         var bufferCtx = buffer.getContext('2d');
-        buffer.fillstyle = 'green'; //  REMOVE
-        bufferCtx.fillRect(0,0,buffer.width, buffer.height); // REMOVE
         this.updatePoints();
 
         return (context) => {
-            this.checkCols();
-            this.isFacingRight = (this.position.x % 1920) < this.mouse.x;
             if (this.isFlying) this.audios.jet.play();
             if (!this.isWalking && !this.isFlying) this.angle = 0;
             else if (!this.isCrouching) this.audios.walk.play();
@@ -253,26 +300,14 @@ class Entity extends Polygon {
             }
             else {
                 this.gravity = 0.3;
-                if (this.thruster < 100) this.thruster += this.dthruster / 50;
+                if (this.thruster < 100) this.thruster += this.dthruster / 25;
             }
+
+            if (this.health < this.maxHealth) this.health += this.dhealth;
             
             this.velocity.y += this.gravity;
             this.position.x += this.velocity.x;
             this.position.y += this.velocity.y;
-           
-            if (this.isFlying) {
-                if (this.velocity.x > 0) this.rotationSpeed = 1;
-                if (this.velocity.x < 0) this.rotationSpeed = -1;
-                if (this.rotation > this.maxRotation) this.rotation = this.maxRotation;
-                if (this.rotation < -this.maxRotation) this.rotation = -this.maxRotation;
-            }
-            if (!this.isFlying) {  // go back smoothly
-                if (this.rotation < 0) this.rotationSpeed = 1;
-                if (this.rotation > 0) this.rotationSpeed = -1;
-                if (this.rotation == 0) this.rotationSpeed = 0;
-            }
-        
-            this.rotation += this.rotationSpeed;
     
             if (!this.isFacingRight) {
                 this.sprite.flip(buffer);

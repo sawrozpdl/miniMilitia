@@ -12,6 +12,8 @@ class Gun {
         this.scope = 2;
         this.isEmpty = false;
         this.hasBeenEquipped = false;
+        this.isReloading = false;
+        this.reloadTimer = 0;
         this.reloadSound = collision.game.audios.reload;
         this.sound = collision.game.audios[this.spriteName];
         this.sound.playbackRate = 2;
@@ -67,6 +69,10 @@ class Gun {
     }
     
     reload() {
+        if (this.liveAmmo >= this.data.maxLiveAmmo) return;
+        this.isReloading = true;
+        this.reloadTimer += (1 / 60);
+        if (this.reloadTimer < (this.data.recoil * 5)) return;
         if (this.ammo == 0) {
             this.isEmpty = true;
             return;
@@ -81,6 +87,8 @@ class Gun {
             this.liveAmmo += neededAmmo;
             this.ammo -= neededAmmo;
         }
+        this.isReloading = false;
+        this.reloadTimer = 0;
     }
 
     pickAmmo(gun) {
@@ -107,6 +115,7 @@ class Gun {
     }
 
     draw(context) {
+        if (this.isReloading) this.reload();
         this.hand.sprite.rotate(this.spriteName, context,
             this.lPosition.x,
             this.lPosition.y,

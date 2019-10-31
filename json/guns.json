@@ -1,50 +1,50 @@
 {
     "ak47": {
-        "damage": 8,
-        "recoil": 0.3,
+        "damage": 9,
+        "recoil": 0.2,
         "maxAmmo": 280,
         "maxLiveAmmo": 60,
         "maxScope": 6,
-        "scale" : 0.5,
+        "scale" : 0.4,
         "holdingPoint": {
-            "x": 0.5,
-            "y": -0.4
+            "x": 0.7,
+            "y": -0.5
         }
     },
     "m16": {
         "damage": 5,
-        "recoil": 0.2,
+        "recoil": 0.1,
         "maxAmmo": 380,
-        "maxLiveAmmo": 80,
+        "maxLiveAmmo": 90,
         "maxScope": 4,
         "scale" : 0.5,
         "holdingPoint": {
-            "x": 0.5,
-            "y": -0.4
+            "x": 0.85,
+            "y": -0.6
         }
     },
     "uzi": {
-        "damage": 5,
+        "damage": 4,
         "recoil": 0.05,
         "maxAmmo": 500,
         "maxLiveAmmo": 100,
         "maxScope": 3,
         "scale" : 0.5,
         "holdingPoint": {
-            "x": 0.5,
-            "y": -0.4
+            "x": 0.7,
+            "y": -0.8
         }
     },
     "pistol": {
         "damage": 10,
-        "recoil": 0.6,
+        "recoil": 0.4,
         "maxAmmo": 80,
         "maxLiveAmmo": 12,
         "maxScope": 3,
         "scale" : 0.5,
         "holdingPoint": {
-            "x": 0.5,
-            "y": -0.4
+            "x": 0.9,
+            "y": -0.6
         }
     }
 }

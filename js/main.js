@@ -1,24 +1,24 @@
-import Sprite from './utils/Sprite.js';
-import Animator from './utils/Animator.js';
-import Layers from './utils/Layers.js';
-import Keyboard from './events/Keyboard.js';
-import Mouse from './events/Mouse.js';
-import Camera from './utils/Camera.js';
-import Map from './objects/Map.js';
-import Collision from './objects/Collision.js';
-import Player from './objects/Player.js';
-import Gun from './objects/Gun.js';
-import Overlay from './objects/Overlay.js';
-import Powerup from './objects/Powerup.js';
-import Robot from './objects/Robot.js';
+import Sprite from './utils/sprite.js';
+import Animator from './utils/animator.js';
+import Layers from './utils/layers.js';
+import Keyboard from './events/keyboard.js';
+import Mouse from './events/mouse.js';
+import Camera from './utils/camera.js';
+import Map from './objects/map.js';
+import Collision from './objects/collision.js';
+import Player from './objects/player.js';
+import Gun from './objects/gun.js';
+import Overlay from './objects/overlay.js';
+import Powerup from './objects/powerup.js';
+import Robot from './objects/robot.js';
 import {
     loadImage,
     loadJson,
     loadMedia
-} from './utils/Loader.js';
+} from './utils/loader.js';
 import {
     genRandom
-} from './utils/Math.js';
+} from './utils/math.js';
 
 
 class Main {
@@ -164,7 +164,7 @@ class Main {
         Promise.all([
             loadMedia('./json/assets.json'),
             loadJson('./json/spriteMap.json'),
-            loadJson('./json/map1.json'),
+            loadJson('./json/map.json'),
             loadJson('./json/guns.json')
         ]).then(([media, spriteMap, mapData, gunData]) => {
             this.images = media.images;
@@ -195,11 +195,23 @@ class Main {
         }
     }
 
+    despawnBots() {
+        let c = 0;
+        this.collision.playerPolygons.forEach(player => {
+            if (player.isBot) {
+                this.collision.playerPolygons.splice(c++, 1);
+                this.botCount--;
+            }
+            else c++;
+        });
+    }
+
     restartGame() {
         this.remLives = 3;
         this.playerKills = 0;
         this.playerScore = 0;
         this.respawnPlayer();
+        this.despawnBots();
         this.gameOver = false;
         this.gameStarted = true;
     }
@@ -250,6 +262,7 @@ class Main {
                 gun.liveAmmo = 1000;
                 this.collision.guns.push(gun);
                 bot.parts.lHand.equip(gun);
+                bot.width = bot.parts.body.getWidth() + bot.parts.lHand.getWidth();
                 bot.setEnemy(this.player);
                 gun.setOwner(bot.parts.lHand);
                 bot.init();
@@ -393,7 +406,6 @@ class Main {
         this.MouseListener.for('click', (e) => {
             this.player.shoot();
         });
-
     }
 
     launch() {

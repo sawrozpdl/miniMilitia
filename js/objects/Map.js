@@ -1,7 +1,7 @@
 import {
     loadImage
-} from '../utils/Loader.js';
-import Polygon from '../objects/Polygon.js';
+} from '../utils/loader.js';
+import Polygon from './polygon.js';
 
 class Map {
 

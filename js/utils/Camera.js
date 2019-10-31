@@ -54,7 +54,9 @@ class Camera {
                 this.xx = 0;
             if (this.game.player.position.y > this.sHeight / 2) 
                 this.yy = this.game.player.position.y - this.sHeight / 2 + this.verticalViewpoint;
-           
+            else if (this.game.player.position.y < this.sHeight / 2) 
+                this.yy = 0;
+
             this.dx = (this.xx - this.x) / 50;
             this.dy = (this.yy - this.y) / 50;    
             this.x += this.dx;
@@ -73,7 +75,7 @@ class Camera {
             context.strokeRect(0, 0, this.game.mainBuffer.width, this.game.mainBuffer.height);
             this.game.collision.playerPolygons.forEach(player => {
                 context.drawImage((player.isBot) ? this.game.images.arrowDownRed : this.game.images.arrowDown,
-                                   player.position.x, player.position.y - 140, 100, 100);
+                                   player.position.x + (player.isFacingRight ? -10 : 20), player.position.y - 100, 70, 70);
             });
             if (this.map) {
                 this.game.mainContext.fillStyle = 'rgba(0, 0, 0, 0.5)';

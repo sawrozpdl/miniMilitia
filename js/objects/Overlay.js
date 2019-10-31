@@ -114,7 +114,6 @@ class Overlay {
                     this.drawThruster();
                     this.drawGun();
                     this.drawStatus();
-                    this.context.drawImage(this.game.images.target, this.game.mouse.x, this.game.mouse.y, 50, 50);
                 }
                 else {
                     if (this.game.remLives <= 0) this.showGameOver();

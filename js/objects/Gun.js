@@ -1,4 +1,4 @@
-import Bullet from './Bullet.js';
+import Bullet from './bullet.js';
 
 class Gun {
 
@@ -127,7 +127,7 @@ class Gun {
         this.hand.sprite.rotate(this.spriteName, context,
             this.lPosition.x,
             this.lPosition.y,
-            this.scale, this.hand.angle, {
+            this.scale * 1.2, this.hand.angle, {
                 x: 0,
                 y: 1
             });

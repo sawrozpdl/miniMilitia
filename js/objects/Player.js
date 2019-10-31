@@ -1,4 +1,4 @@
-import Entity from "./Entity.js";
+import Entity from "./entity.js";
 
 class Player extends Entity {
 
@@ -52,26 +52,6 @@ class Player extends Entity {
     unCrouch() {
         this.isCrouching = false;
         this.position.y -= 10;
-    }
-
-    resolveCollisions() {
-        if (this.cstate.includes(1) && this.cstate.includes(7)) {
-            this.position.x += 3;
-            this.position.y += 3;
-        }
-        if (this.cstate.includes(1) && this.cstate.includes(3)) {
-            this.position.x -= 3;
-            this.position.y += 3;
-        }
-        if (this.cstate.includes(5) && !this.isCrouching && (this.cstate.includes(6.5) || this.cstate.includes(3.5))) {
-            this.position.y -= 1;
-        }
-        if (this.hasRockAbove()) {
-            this.position.y += 1;
-        }
-        if ((this.cstate.includes(3.5) && this.cstate.includes(6.5)) && this.hasRockBelow()) {
-            this.position.y -= 1;
-        }
     }
 
     die() {

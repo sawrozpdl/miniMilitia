@@ -9,8 +9,7 @@
         "./assets/images/tiles.png",
         "./assets/images/arrowDown.png",
         "./assets/images/arrowDownRed.png",
-        "./assets/images/gameOver.png",
-        "./assets/images/target.png"
+        "./assets/images/gameOver.png"
     ], 
     "audios" : [
         "./assets/audios/ak47.wav",

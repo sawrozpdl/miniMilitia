@@ -1,9 +1,9 @@
-import Head from "./Head.js";
-import Hand from "./Hand.js";
-import Body from "./Body.js";
-import Leg from "./Leg.js";
-import {Vector} from '../utils/Math.js';
-import Polygon from "./Polygon.js";
+import Head from "./head.js";
+import Hand from "./hand.js";
+import Body from "./body.js";
+import Leg from "./leg.js";
+import {Vector} from '../utils/math.js';
+import Polygon from "./polygon.js";
 
 class Entity extends Polygon {
 
@@ -34,8 +34,8 @@ class Entity extends Polygon {
         this.thruster = 100;
         this.maxHealth = 100;
         this.health = 100;
-        this.dhealth = 0.01;
-        this.dthruster = 1;
+        this.dHealth = 0.03;
+        this.dthruster = 1.5;
         this.isFacingRight = true;
         this.isWalking = false;
         this.isFlying = false;
@@ -108,6 +108,26 @@ class Entity extends Polygon {
                             !this.hasRockAbove());
     }
 
+    resolveCollisions() {
+        if (this.cstate.includes(1) && this.cstate.includes(7)) {
+            this.position.x += 3;
+            this.position.y += 3;
+        }
+        if (this.cstate.includes(1) && this.cstate.includes(3)) {
+            this.position.x -= 3;
+            this.position.y += 3;
+        }
+        if (this.cstate.includes(5) && !this.isCrouching && (this.cstate.includes(6.5) || this.cstate.includes(3.5))) {
+            this.position.y -= 1;
+        }
+        if (this.hasRockAbove()) {
+            this.position.y += 1;
+        }
+        if ((this.cstate.includes(3.5) && this.cstate.includes(6.5)) && this.hasRockBelow()) {
+            this.position.y -= 1;
+        }
+    }
+
     shoot() {
         this.parts.lHand.shoot();
         this.parts.rHand.shoot();
@@ -130,7 +150,7 @@ class Entity extends Polygon {
             this.position.x -= 1;
             return;
         }
-        this.velocity.x = -2;
+        this.velocity.x = -2 - (this.isFlying ? 1 : 0);
     }
 
     moveRight() {
@@ -145,7 +165,7 @@ class Entity extends Polygon {
             this.position.x += 1;
             return;
         }
-        this.velocity.x = 2;
+        this.velocity.x = 2 + (this.isFlying ? 1 : 0);
     }
 
     stopWalking() {
@@ -167,7 +187,7 @@ class Entity extends Polygon {
             return;
         }
         this.isFlying = true;
-        this.velocity.y = -4; //fix this
+        this.velocity.y = -4; 
         this.thruster -= this.dthruster;
     }
 
@@ -180,11 +200,10 @@ class Entity extends Polygon {
         var damage = bullet.damage * (1 / this.armourLevel);
         if (this.health <= damage) this.kill();
         else {
-            this.health -= damage;
+            this.health -= damage * ((this.isCrouching) ? 0.6 : 1);
         }
     }
     
-
     kill() {
         this.isKilled = true;
         this.die();
@@ -310,7 +329,7 @@ class Entity extends Polygon {
                 this.velocity.y = 0;
             }
 
-            if (this.health < this.maxHealth) this.health += this.dhealth;
+            if (this.health < this.maxHealth) this.health += this.dHealth;
             
             this.velocity.y += this.gravity;
             this.position.x += this.velocity.x;
@@ -324,6 +343,14 @@ class Entity extends Polygon {
             this.sprite.rotate(buffer, context,
                 this.position.x, this.position.y,
                 0.5, this.rotation * (Math.PI / 180), {x : 1, y : 1});
+
+            if (this.position.y > 1152 || this.position.y < 0 || this.position.x < 0 || this.position.x > 3328) {
+                if (this.health < (this.dHealth * 4)) {
+                    this.kill();
+                }
+                else this.health -= this.dHealth * 4;
+                
+            }
 
         }
 

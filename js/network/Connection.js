@@ -1,3 +1,3 @@
-import Peer from './Peer.js';
+import Peer from './peer.js';
 
 

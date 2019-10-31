@@ -1,4 +1,4 @@
-import Entity from './Entity.js';
+import Entity from './entity.js';
 
 class Robot extends Entity {
 
@@ -7,10 +7,12 @@ class Robot extends Entity {
         this.isBot = true;
         this.gravity = 0;
         this.enemyDistance = 0;
-        this.roamingDistance = this.genRandom(20, 320);
+        this.roamingDistance = this.genRandom(200, 300);
         this.dthruster = 0;
         this.rotation = 0;
         this.difficulty = params.difficulty;
+        this.resolved = true;
+        this.timer = 0;
     }
 
     stopFlying() {
@@ -31,12 +33,36 @@ class Robot extends Entity {
                 this.moveRight();
                 return;
             }
-            else if ((this.isFacingLeft && !this.hasRockLeft())) {
+            else if ((!this.isFacingRight && !this.hasRockLeft())) {
                 this.moveLeft();
                 return;
             }
+            else this.resolveWay();
         }
         this.position.y -= 2;
+    }
+
+    resolveWay() {
+        if (this.isFacingRight) {
+            this.position.x--;
+            if (this.hasRockAbove()) this.position.y++;
+            else this.position.y--;
+            if (this.timer >= 2) {
+                this.resolved = true;
+                this.timer = 0;
+            }
+            this.timer += 1 / 60;
+        }
+        else {
+            this.position.x++;
+            if (this.hasRockAbove()) this.position.y++;
+            else this.position.y--;
+            if (this.timer >= 2) {
+                this.resolved = true;
+                this.timer = 0;
+            }
+            this.timer += 1 / 60;
+        }
     }
 
     moveLeft() {
@@ -61,10 +87,11 @@ class Robot extends Entity {
                 this.moveRight();
                 return;
             }
-            else if ((this.isFacingLeft && !this.hasRockLeft())) {
+            else if ((!this.isFacingRight && !this.hasRockLeft())) {
                 this.moveLeft();
                 return;
             }
+            else this.resolveWay();
         }
         this.position.y += 2;
     }
@@ -83,13 +110,13 @@ class Robot extends Entity {
 
     killEnemy() { 
         if ((this.enemyDistance < this.roamingDistance)) { 
-            if ((this.enemyHeight > 0) && (this.enemyHeight > this.roamingDistance * 1.5))
+            if ((this.enemyHeight > 0) && (this.enemyHeight > this.roamingDistance * 1.2))
                 this.moveDown();
-            else if ((this.enemyHeight < 0) && (Math.abs(this.enemyHeight) > this.roamingDistance * 1.5))
+            else if ((this.enemyHeight < 0) && (Math.abs(this.enemyHeight) > this.roamingDistance * 1.2))
                 this.moveUp();
             else if ((Math.random() < (0.05 * this.difficulty)) && !this.enemy.isKilled) {
                 this.stop();
-                this.shoot();
+                //this.shoot();
             }
             return;
         }
@@ -109,7 +136,10 @@ class Robot extends Entity {
             this.enemyDistance = (this.position.x - this.enemy.position.x) * ((this.isFacingRight) ? -1 : 1);
             this.enemyHeight = (this.enemy.position.y - this.position.y);
             defaultCallback(context);
-            this.killEnemy();
+            if (this.resolved) this.killEnemy();
+            else this.resolveWay();
+
+            this.resolveCollisions();
         }
     }
 

@@ -1,4 +1,4 @@
-import BodyPart from "./BodyPart.js";
+import BodyPart from "./bodyPart.js";
 
 class Body extends BodyPart{
     

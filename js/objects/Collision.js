@@ -31,6 +31,20 @@ class Collision {
             (player.position.y + player.height * 0.6) > object.position.y);
     }
 
+    touches(player, gun) {
+        return (player.position.x < (gun.position.x + gun.width * gun.scale) &&
+            (player.position.x + player.width * 0.25) > gun.position.x &&
+            player.position.y < (gun.position.y + gun.height * gun.scale) &&
+            (player.position.y + player.height * 0.3) > gun.position.y);
+    }
+
+    hits(player, bullet) {
+        return (player.position.x < (bullet.position.x + bullet.width*bullet.size) &&
+            (player.position.x + player.width * 0.25) > bullet.position.x &&
+            player.position.y < (bullet.position.y + bullet.height*bullet.size) &&
+            (player.position.y + player.height * 0.3) > bullet.position.y);
+    }
+
     contains(point, points) {
         let x = point.x;
         let y = point.y;
@@ -53,6 +67,9 @@ class Collision {
         this.playerPolygons.forEach(player => {
             if (!player.isKilled) {
                 if (player.isBot) player.draw()(this.game.context);
+                if (player.isBot && player.enemy.isKilled) {
+                    player.enemy = this.mainPlayer;
+                }
                 this.state = [];
                 this.rockPolygons.forEach(rock => {
                     if (this.canCollide(player, rock)) {
@@ -108,17 +125,15 @@ class Collision {
                 bullet.update();
                 this.playerPolygons.forEach(player => {
                     if (player == bullet.player) return;
-                    else if (bullet.player.isBot && player.isBot) return;
-                    if (this.canCollide(player, bullet)) {
+                    else if (bullet.player.isBot && player.isBot && (bullet.player.enemy != player)) return;
+                    if (this.hits(player, bullet)) {
                         bullet.hasHit = true;
                         player.getShot(bullet);
                     }
                 });
                 this.rockPolygons.forEach(rock => {
-                    if (this.canCollide(rock, bullet)) {
-                        if (this.contains(bullet.position, rock.points)) { // OPT
-                            bullet.hasHit = true;
-                        }
+                    if (this.contains(bullet.position, rock.points)) { // OPT
+                        bullet.hasHit = true;
                     }
                 });
                 if (bullet.hasHit) this.bullets.splice(i, 1);
@@ -129,7 +144,7 @@ class Collision {
             this.guns.forEach(gun => {
                 if (!gun.hasBeenEquipped) {
                     gun.show(this.game.context);
-                    if (this.canCollide(this.mainPlayer, gun)) {
+                    if (this.touches(this.mainPlayer, gun)) {
                         this.game.canEquip = gun;
                     }
                     if (!gun.hasSettled) {
@@ -154,7 +169,7 @@ class Collision {
                     this.powerUps.splice(k++, 1);
                 } else {
                     powerUp.show();
-                    if (this.canCollide(this.mainPlayer, powerUp)) {
+                    if (this.touches(this.mainPlayer, powerUp)) {
                         this.game.player.pickPowerup(powerUp);
                         this.game.playerScore += 20;
                         this.game.audios.switch.play();
@@ -187,6 +202,11 @@ class Collision {
                 if (this.game.botCount < 3) {
                     this.game.genBots();
                 }
+            }
+
+            if (this.game.botCount > 3) {
+                this.playerPolygons[2].setEnemy(this.playerPolygons[4]);
+                this.playerPolygons[4].setEnemy(this.playerPolygons[2]);
             }
 
             if (this.timer > 45) {

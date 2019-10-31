@@ -190,7 +190,7 @@ class Collision {
                 this.game.genPowerups();
                 this.timer = 0;
             }
-            this.timer += (1 / this.game.FRAME_LIMIT);
+            this.timer += (1 / 60);
         }
     }
 

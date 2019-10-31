@@ -408,6 +408,7 @@ class Main {
             this.layers.setCamera(this.camera.update());
             this.layers.setOverlay(this.overlay.show());
             this.setEventListeners();
+            window.game = this;
         });
     }
 }

@@ -1,6 +1,6 @@
 {
        "tileSheet": {
-              "url": "../assets/images/tiles.png",
+              "url": "./assets/images/tiles.png",
               "width": 992,
               "height": 992,
               "margin": 2,

@@ -25,8 +25,8 @@ class Main {
 
     constructor(canvas) {
         this.canvas = canvas;
-        canvas.style.width = "100%";
-        canvas.style.height = "100%";
+        canvas.style.width = '100%';
+        canvas.style.height = '100%';
         this.GAME_WIDTH = 2223;
         this.GAME_HEIGHT = 1080;
         this.FRAME_LIMIT = 60;
@@ -119,10 +119,10 @@ class Main {
         this.layers.setContext(this.mainContext);
         
         Promise.all([
-            loadImage('../assets/images/background-main.png'),
-            loadImage('../assets/images/loading.png'),
-            loadImage('../assets/images/logo.png'),
-            loadImage('../assets/images/play.png')
+            loadImage('../../assets/images/background-main.png'),
+            loadImage('../../assets/images/loading.png'),
+            loadImage('../../assets/images/logo.png'),
+            loadImage('../../assets/images/play.png')
         ]).then(([background,loading, logo, play]) => {
             var i = 0;
             var offset = 0;
@@ -134,10 +134,10 @@ class Main {
                     if (offset < 150) offset+=5;
                     context.drawImage(play, (this.GAME_WIDTH - play.width) / 2, 300 + offset, 320, 188);
                     this.playButton = {
-                        "x" : (this.GAME_WIDTH - play.width) / 2,
-                        "y" : 300 + offset,
-                        "width" : 320,
-                        "height" : 188
+                        'x' : (this.GAME_WIDTH - play.width) / 2,
+                        'y' : 300 + offset,
+                        'width' : 320,
+                        'height' : 188
                     }
                 }
                 else this.sprite.rotate(loading, context, (this.GAME_WIDTH - loading.width * 0.1) / 2,
@@ -156,10 +156,10 @@ class Main {
     loadAssets() {
         this.deployLoadingScreen();
         Promise.all([
-            loadMedia('../json/assets.json'),
-            loadJson('../json/spriteMap.json'),
-            loadJson('../json/map1.json'),
-            loadJson("../../json/guns.json")
+            loadMedia('../../json/assets.json'),
+            loadJson('../../json/spriteMap.json'),
+            loadJson('../../json/map1.json'),
+            loadJson('../../../json/guns.json')
         ]).then(([media, spriteMap, mapData, gunData]) => {
             this.images = media.images;
             this.audios = media.audios;
@@ -241,7 +241,6 @@ class Main {
                 gun.setOwner(bot.parts.lHand);
                 bot.init();
                 this.collision.playerPolygons.push(bot);
-                //this.layers.push(bot.draw());
                 this.botCount++;
                 if (this.botCount >= 3) return;
             }

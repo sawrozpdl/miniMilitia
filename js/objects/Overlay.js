@@ -78,7 +78,7 @@ class Overlay {
             localStorage.setItem('highScore', this.game.playerScore);
             this.game.highScore = this.game.playerScore;
         }
-        this.context.fillText(`HighScore : ${this.game.highScore}`, 800, 300);
+        this.context.fillText(`HighScore : ${this.game.highScore}`, 830, 200);
         this.game.gameOver = true;
     }
 

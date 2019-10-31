@@ -50,6 +50,8 @@ class Camera {
             
             if (this.game.player.position.x > this.sWidth / 2) 
                 this.xx = this.game.player.position.x - this.sWidth / 2 + this.horizontalViewPoint;
+            else if (this.game.player.position.x < this.sWidth / 2) 
+                this.xx = 0;
             if (this.game.player.position.y > this.sHeight / 2) 
                 this.yy = this.game.player.position.y - this.sHeight / 2 + this.verticalViewpoint;
            

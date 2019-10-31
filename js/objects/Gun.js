@@ -7,6 +7,10 @@ class Gun {
         this.sprite = sprite;
         this.collision = collision;
         this.data = gunData[spriteName];
+        this.init();
+    }
+
+    init() {
         this.ammo = this.data.maxAmmo;
         this.liveAmmo = this.data.maxLiveAmmo;
         this.scope = 2;
@@ -15,8 +19,8 @@ class Gun {
         this.isReloading = false;
         this.hasSettled = false;
         this.reloadTimer = 0;
-        this.reloadSound = collision.game.audios.reload;
-        this.sound = collision.game.audios[this.spriteName];
+        this.reloadSound = this.collision.game.audios.reload;
+        this.sound = this.collision.game.audios[this.spriteName];
         this.sound.playbackRate = 2;
         this.scale = 0.25; // Default
         this.width = this.sprite.getDim(this.spriteName).width * this.scale;
@@ -33,7 +37,7 @@ class Gun {
     setOwner(playerHand) {
         this.hand = playerHand;
         this.hasBeenEquipped = true;
-        this.init();
+        this.setDims();
     }
 
     resetOwner() {
@@ -41,7 +45,7 @@ class Gun {
         this.hasBeenEquipped = false;
     }
 
-    init() {
+    setDims() {
         this.scale = this.hand.scale / 1.5;
         this.width = this.sprite.getDim(this.spriteName).width * this.scale;
         this.height = this.sprite.getDim(this.spriteName).height * this.scale;

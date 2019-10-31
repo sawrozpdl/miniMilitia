@@ -104,7 +104,7 @@ class Main {
         this.player.throwGuns();
         this.player.equip(lgun);
         this.collision.guns.push(lgun);
-        let pos = this.spawnPoints.players[2 + Math.floor(Math.random() * (this.spawnPoints.players.length - 2))];
+        let pos = this.spawnPoints.players[Math.floor(Math.random() * this.spawnPoints.players.length)];
         this.player.position.x = pos.x + 0;
         this.player.position.y = pos.y + 0;
         this.playerType = 'indian';
@@ -386,8 +386,8 @@ class Main {
         });
 
         this.MouseListener.for('mousemove', (e) => {
-            this.mouse.x = e.clientX;
-            this.mouse.y = e.clientY;
+            this.mouse.x = e.clientX * (this.GAME_WIDTH / window.screen.width);
+            this.mouse.y = e.clientY * (this.GAME_HEIGHT / window.screen.height);
         });
 
         this.MouseListener.for('click', (e) => {
@@ -401,6 +401,7 @@ class Main {
             this.layers.push(this.map.drawBackground());
             this.layers.push(this.map.drawForeground());
             this.spawnPlayer();
+            this.map.setSprite(this.sprite);
             this.layers.push(this.map.drawBushes());
             this.genGuns();
             this.genPowerups();

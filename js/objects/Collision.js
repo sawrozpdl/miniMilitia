@@ -183,10 +183,13 @@ class Collision {
 
             this.setCollisionState();
 
-            if (this.timer > 45) {
+            if (!(Math.floor(this.timer) % 5)) {
                 if (this.game.botCount < 3) {
                     this.game.genBots();
                 }
+            }
+
+            if (this.timer > 45) {
                 let c = 0;
                 this.guns.forEach(gun => {
                     if (!gun.hasBeenEquipped) {

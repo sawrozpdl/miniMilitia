@@ -10,6 +10,10 @@ class Map {
         this.init();
     }
 
+    setSprite(sprite) {
+        this.sprite = sprite;
+    }
+
     init() {
         this.width = this.mapData.map.width;
         this.height = this.mapData.map.height;
@@ -104,7 +108,8 @@ class Map {
     drawBushes() {
 
         return (context) => {
-
+            this.sprite.draw('bush', context, 650, 340, 1);
+            this.sprite.draw('tree', context, 1000, 320, 0.7);
         }
     }
 

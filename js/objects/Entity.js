@@ -119,6 +119,7 @@ class Entity extends Polygon {
     }
 
     moveLeft() {
+        if (this.isKilled) return;
         if (this.hasRockLeft()) {
             this.stopWalking();
             return;
@@ -133,6 +134,7 @@ class Entity extends Polygon {
     }
 
     moveRight() {
+        if (this.isKilled) return;
         if (this.hasRockRight()) {
             this.stopWalking();
             return;
@@ -159,6 +161,7 @@ class Entity extends Polygon {
     }
 
     flyUp() {
+        if (this.isKilled) return;
         if (this.hasRockAbove() || this.thruster <= 0) {
             this.stopFlying();
             return;
@@ -294,7 +297,7 @@ class Entity extends Polygon {
                 }
             }
             
-            if (this.isFlying) {
+            if (this.isFlying || this.isKilled) {
                 this.gravity = 0;
                 this.hasLanded = false;
             }

@@ -81,7 +81,7 @@ class Overlay {
             localStorage.setItem('highScore', this.game.playerScore);
             this.game.highScore = this.game.playerScore;
         }
-        this.context.fillText(`HighScore : ${this.game.highScore}`, 830, 200);
+        this.context.fillText(`HighScore : ${this.game.highScore}`, 940, 210);
         this.game.gameOver = true;
     }
 
@@ -91,9 +91,9 @@ class Overlay {
 
     nextLife() {
         this.timer += (1 / 60);
-        this.sprite.draw(this.game.playerType + "-head", this.context, 2000, 70, 0.5);
         this.context.fillStyle = 'rgba(0,0,0,0.8)';
         this.context.fillRect(0, 0, this.game.GAME_WIDTH, this.game.GAME_HEIGHT);
+        this.sprite.draw(this.game.playerType + "-head", this.context, 2000, 70, 0.5);
         this.context.fillStyle = 'white';
         this.context.fillText(`x  ${this.game.remLives}`, 2080, 110);
         this.context.fillText('You were Killed!', 930, 360);
@@ -114,9 +114,10 @@ class Overlay {
                     this.drawThruster();
                     this.drawGun();
                     this.drawStatus();
+                    this.context.drawImage(this.game.images.target, this.game.mouse.x, this.game.mouse.y, 50, 50);
                 }
                 else {
-                    if (this.game.remLives < 0) this.showGameOver();
+                    if (this.game.remLives <= 0) this.showGameOver();
                     else {
                         this.nextLife();
                     }

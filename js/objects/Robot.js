@@ -26,9 +26,15 @@ class Robot extends Entity {
     }
 
     moveUp() {
-        if (this.position.y < 200) return;
-        if (this.hasRockAbove()) {
-            return;
+        if (this.position.y < 400 || this.hasRockAbove()) {
+            if (this.isFacingRight && !this.hasRockRight()) {
+                this.moveRight();
+                return;
+            }
+            else if ((this.isFacingLeft && !this.hasRockLeft())) {
+                this.moveLeft();
+                return;
+            }
         }
         this.position.y -= 2;
     }
@@ -46,14 +52,20 @@ class Robot extends Entity {
             if (!this.hasRockAbove()) this.moveUp();
             else this.moveDown();
         }
-        if (!this.hasRockBelow()) {
-            this.moveUp();
-        }
         this.position.x += 2;
     }
 
     moveDown() {
-        if (this.hasRockBelow()) return;
+        if (this.position.y > 980 || this.hasRockBelow()) {
+            if (this.isFacingRight && !this.hasRockRight()) {
+                this.moveRight();
+                return;
+            }
+            else if ((this.isFacingLeft && !this.hasRockLeft())) {
+                this.moveLeft();
+                return;
+            }
+        }
         this.position.y += 2;
     }
 
@@ -71,8 +83,14 @@ class Robot extends Entity {
 
     killEnemy() { 
         if ((this.enemyDistance < this.roamingDistance)) { 
-            if ((Math.random() < (0.05 * this.difficulty)) && !this.enemy.isKilled) this.shoot();
-            this.stop();
+            if ((this.enemyHeight > 0) && (this.enemyHeight > this.roamingDistance * 1.5))
+                this.moveDown();
+            else if ((this.enemyHeight < 0) && (Math.abs(this.enemyHeight) > this.roamingDistance * 1.5))
+                this.moveUp();
+            else if ((Math.random() < (0.05 * this.difficulty)) && !this.enemy.isKilled) {
+                this.stop();
+                this.shoot();
+            }
             return;
         }
         if (this.isFacingRight) this.moveRight();
@@ -89,6 +107,7 @@ class Robot extends Entity {
         return (context) => {
             this.isFacingRight = this.position.x < this.enemy.position.x;
             this.enemyDistance = (this.position.x - this.enemy.position.x) * ((this.isFacingRight) ? -1 : 1);
+            this.enemyHeight = (this.enemy.position.y - this.position.y);
             defaultCallback(context);
             this.killEnemy();
         }

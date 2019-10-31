@@ -297,13 +297,17 @@ class Entity extends Polygon {
                 }
             }
             
-            if (this.isFlying || this.isKilled) {
+            if (this.isFlying) {
                 this.gravity = 0;
                 this.hasLanded = false;
             }
             else {
                 this.gravity = 0.3;
                 if (this.thruster < 100) this.thruster += this.dthruster / 25;
+            }
+            if (this.isKilled) {
+                this.gravity = 0;
+                this.velocity.y = 0;
             }
 
             if (this.health < this.maxHealth) this.health += this.dhealth;

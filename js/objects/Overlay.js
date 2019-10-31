@@ -66,7 +66,20 @@ class Overlay {
     }
 
     showGameOver() {
-        console.log('Game Over');
+        var gameOver = this.game.images.gameOver;
+        this.context.fillStyle = 'rgba(0,0,0,0.8)';
+        this.context.fillRect(0, 0, this.game.GAME_WIDTH, this.game.GAME_HEIGHT);
+        this.context.drawImage(gameOver, (this.game.GAME_WIDTH - gameOver.width) / 2, (this.game.GAME_HEIGHT - gameOver.height) / 3);
+        this.context.fillStyle = 'white';
+        this.context.fillText(`Kills : ${this.game.playerKills}`, 1200, 90);
+        this.context.fillText(`Score : ${this.game.playerScore}`, 1500, 90);
+        this.context.fillText("Press Enter to try again", this.game.GAME_WIDTH / 2.65, this.game.GAME_HEIGHT - 300);
+        if (this.game.playerScore > this.game.highScore) {
+            localStorage.setItem('highScore', this.game.playerScore);
+            this.game.highScore = this.game.playerScore;
+        }
+        this.context.fillText(`HighScore : ${this.game.highScore}`, 800, 300);
+        this.game.gameOver = true;
     }
 
     requestRespawn() {
@@ -75,7 +88,14 @@ class Overlay {
 
     nextLife() {
         this.timer += (1 / 60);
-        console.log('respawning in ', 5 - this.timer);
+
+        this.sprite.draw(this.game.playerType + "-head", this.context, 2000, 70, 0.5);
+        this.context.fillStyle = 'rgba(0,0,0,0.8)';
+        this.context.fillRect(0, 0, this.game.GAME_WIDTH, this.game.GAME_HEIGHT);
+        this.context.fillStyle = 'white';
+        this.context.fillText(`x  ${this.game.remLives}`, 2080, 110);
+        this.context.fillText(`Respawning in  ${Math.floor(6 - this.timer)} Seconds`, 830, 450);
+
         if (this.timer < 5) return;
         else {
             this.requestRespawn();

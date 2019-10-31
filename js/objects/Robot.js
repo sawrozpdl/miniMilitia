@@ -34,7 +34,6 @@ class Robot extends Entity {
         this.position.y -= 2;
     }
 
-
     moveLeft() {
         if (this.hasRockLeft()) {
             if (!this.hasRockAbove()) this.moveUp();
@@ -73,7 +72,7 @@ class Robot extends Entity {
 
     killEnemy() { 
         if ((this.enemyDistance < this.roamingDistance)) { 
-            if ((Math.random() < (0.01 * this.difficulty)) && !this.enemy.isKilled) this.shoot();
+            if ((Math.random() < (0.05 * this.difficulty)) && !this.enemy.isKilled) this.shoot();
             this.stop();
             return;
         }
@@ -82,9 +81,7 @@ class Robot extends Entity {
     }
 
     die() {
-        this.velocity.y = 8;
-        this.isFlying = false;
-        this.parts.lHand.equippedGun.liveAmmo = 0;
+        if (this.parts.lHand.equippedGun) this.parts.lHand.equippedGun.liveAmmo = 0;
         this.throwGuns();
     }
 

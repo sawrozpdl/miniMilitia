@@ -8,7 +8,8 @@
         "../assets/images/shell.png",
         "../assets/images/tiles.png",
         "../assets/images/arrowDown.png",
-        "../assets/images/arrowDownRed.png"
+        "../assets/images/arrowDownRed.png",
+        "../assets/images/gameOver.png"
     ], 
     "audios" : [
         "../assets/audios/ak47.wav",

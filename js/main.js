@@ -1,7 +1,9 @@
 import Sprite from './utils/Sprite.js';
 import Animator from './utils/Animator.js';
 import Layers from './utils/Layers.js';
-import {genRandom} from './utils/Math.js';
+import {
+    genRandom
+} from './utils/Math.js';
 import Keyboard from './events/Keyboard.js';
 import Mouse from './events/Mouse.js';
 import Camera from './utils/Camera.js';
@@ -28,11 +30,11 @@ class Main {
         this.GAME_WIDTH = 2223;
         this.GAME_HEIGHT = 1080;
         this.FRAME_LIMIT = 60;
-        
+
         this.robots = [];
         this.playButton = {
-            x : 0,
-            y : 0
+            x: 0,
+            y: 0
         }
         this.mainContext = this.canvas.getContext('2d');
         this.mainBuffer = document.createElement('canvas');
@@ -53,21 +55,23 @@ class Main {
         this.playerType = 'indian';
         this.playerKills = 0;
         this.playerScore = 0;
+        this.highScore = +localStorage.getItem('highScore');
         this.botCount = 0;
         this.hasLoaded = false;
         this.gameStarted = false;
+        this.gameOver = false;
         this.mouse = {
             x: 0,
             y: 0
         };
         this.canEquip = null;
         this.player = new Player(this.sprite, this.playerType,
-                this.playerPosition, this.mouse, 0.5, this.audios);
+            this.playerPosition, this.mouse, 0.5, this.audios);
         this.collision = new Collision(this);
         this.overlay = new Overlay(this);
     }
 
-    setDimensions() { 
+    setDimensions() {
         this.canvas.width = this.GAME_WIDTH;
         this.canvas.height = this.GAME_HEIGHT;
     }
@@ -75,10 +79,9 @@ class Main {
     spawnPlayer() {
         var pos = this.spawnPoints.players[Math.floor(Math.random() * this.spawnPoints.players.length)];
         this.player.position = {
-            x : pos.x + 0,
-            y : pos.y + 0
+            x: pos.x + 0,
+            y: pos.y + 0
         }
-        console.log(this.player.position);
         this.player.spawn();
         var lgun = new Gun(((Math.random() < 0.5) ? 'uzi' : 'pistol'), this.sprite, this.gunData, this.collision);
         this.player.equip(lgun);
@@ -88,13 +91,13 @@ class Main {
     }
 
     respawnPlayer() {
-        this.player.health = 100;
+        this.player.health = this.player.maxHealth;
         this.player.thruster = 100;
         var lgun = new Gun('uzi', this.sprite, this.gunData, this.collision);
         this.player.throwGuns();
         this.player.equip(lgun);
         this.guns.push(lgun);
-        var pos = this.spawnPoints.players[Math.floor(Math.random() * this.spawnPoints.players.length)];
+        var pos = this.spawnPoints.players[2 + Math.floor(Math.random() * (this.spawnPoints.players.length - 2))];
         this.player.position.x = pos.x + 0;
         this.player.position.y = pos.y + 0;
         this.playerType = 'indian';
@@ -114,6 +117,7 @@ class Main {
     deployLoadingScreen() {
         this.setDimensions();
         this.layers.setContext(this.mainContext);
+        
         Promise.all([
             loadImage('../assets/images/background-main.png'),
             loadImage('../assets/images/loading.png'),
@@ -173,23 +177,32 @@ class Main {
     startGame(e) {
         var cx = e.clientX * this.GAME_WIDTH / window.screen.width;
         var cy = e.clientY * this.GAME_HEIGHT / window.screen.height;
-        if (cx > this.playButton.x && cx < (this.playButton.x + this.playButton.width) &&
-            cy > this.playButton.y && cy < (this.playButton.y + this.playButton.height)) {
-                this.dumpRecentScreen(); // which is loading screen
-                this.layers.setContext(this.context);
-                this.animation.setFrameLimit(this.FRAME_LIMIT);
-                this.init();
-                this.map.setCollisionLayer(this.collision);
-                this.launch();
-                this.gameStarted = true;
-            }
+        if (cx >= this.playButton.x && cx <= (this.playButton.x + this.playButton.width) &&
+            cy >= this.playButton.y && cy <= (this.playButton.y + this.playButton.height)) {
+            this.dumpRecentScreen(); // which is loading screen
+            this.layers.setContext(this.context);
+            this.animation.setFrameLimit(this.FRAME_LIMIT);
+            this.init();
+            this.map.setCollisionLayer(this.collision);
+            this.launch();
+            this.gameStarted = true;
+        }
+    }
+
+    restartGame() {
+        this.remLives = 3;
+        this.playerKills = 0;
+        this.playerScore = 0;
+        this.respawnPlayer();
+        this.gameOver = false;
+        this.gameStarted = true;
     }
 
     genGuns() {
         this.spawnPoints.guns.forEach(point => {
-            if (Math.random() < 0.3) return; 
+            if (Math.random() < 0.3) return;
             var gun = new Gun(this.gunNames[Math.floor(Math.random() * this.gunNames.length)],
-                         this.sprite, this.gunData, this.collision);
+                this.sprite, this.gunData, this.collision);
             gun.position.x = point.x + 0;
             gun.position.y = point.y + 0;
             this.guns.push(gun);
@@ -203,8 +216,8 @@ class Main {
         this.spawnPoints.powerups.forEach(pposition => {
             let powerup = new Powerup(powerUps[c % 2], this.sprite, this.context);
             powerup.position = {
-                x : pposition.x,
-                y : pposition.y
+                x: pposition.x,
+                y: pposition.y
             }
             this.collision.powerUps.push(powerup);
             c++;
@@ -213,13 +226,13 @@ class Main {
 
     genBots() {
         this.spawnPoints.players.forEach(ppoint => {
-            if (Math.random() < 0.1) {
+            if (Math.random() < 0.2) {
                 var bot = new Robot(this.sprite, undefined, this.MouseListener, 0.5, this.audios, genRandom(1, 4));
                 var gun = new Gun(this.gunNames[Math.floor(Math.random() * this.gunNames.length)],
-                                this.sprite, this.gunData, this.collision);
+                    this.sprite, this.gunData, this.collision);
                 bot.position = {
-                    x : ppoint.x + 0,
-                    y : ppoint.y + 0
+                    x: ppoint.x + 0,
+                    y: ppoint.y + 0
                 }
                 gun.liveAmmo = 1000;
                 this.guns.push(gun);
@@ -228,21 +241,10 @@ class Main {
                 gun.setOwner(bot.parts.lHand);
                 bot.init();
                 this.collision.playerPolygons.push(bot);
-                this.layers.push(bot.draw());
+                //this.layers.push(bot.draw());
                 this.botCount++;
                 if (this.botCount >= 3) return;
             }
-        });
-    }
-
-    despawnGuns() {
-        let c = 0;
-        this.guns.forEach(gun => {
-            if (gun.hasBeenEquipped) {
-                c++;
-                continue;
-            }
-            this.guns.splice(c++, 1);
         });
     }
 
@@ -284,8 +286,7 @@ class Main {
                 this.player.equip(this.canEquip);
                 this.camera.setScope(this.canEquip.scope);
                 this.gameScope = this.canEquip.scope;
-            }
-            else {
+            } else {
                 this.player.throwGuns();
                 if (!this.player.parts.rHand.hasEquippedGun) {
                     this.camera.setScope(1.5);
@@ -296,6 +297,12 @@ class Main {
 
         this.keyListener.for(71, (down) => {
             this.player.pickAmmo(this.canEquip);
+        });
+
+        this.keyListener.for(13, (down) => {
+            if (this.gameOver) {
+                this.restartGame();
+            }
         });
 
         this.keyListener.for(9, (down) => {
@@ -315,15 +322,15 @@ class Main {
         });
 
         this.keyListener.for(49, (down) => { // 2x
-            if (this.player.parts.lHand.hasEquippedGun || this.player.parts.rHand.hasEquippedGun) 
+            if (this.player.parts.lHand.hasEquippedGun || this.player.parts.rHand.hasEquippedGun)
                 this.camera.setScope(1.5);
-                this.gameScope = 2;
+            this.gameScope = 2;
         });
 
         this.keyListener.for(50, (down) => { // 3x
             if (this.player.parts.lHand.hasEquippedGun || this.player.parts.rHand.hasEquippedGun)
                 this.camera.setScope(2);
-                this.gameScope = 3;
+            this.gameScope = 3;
         });
 
         this.keyListener.for(51, (down) => { // 4x

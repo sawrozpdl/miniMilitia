@@ -41,8 +41,8 @@ class Collision {
             y1 = points[i].y;
             x2 = points[j].x,
             y2 = points[j].y;
-            // we need only the required lines to check # y - y1 = M (x - x1)
-            if ((y1 > y) != (y2 > y) && (x < (x2 - x1) * (y - y1) / (y2 - y1) + x1))
+            if ((y1 > y) == (y2 > y)) continue; // we need only the required lines to check 
+            if ((x < (x2 - x1) * (y - y1) / (y2 - y1) + x1))   // y - y1 = M (x - x1)
                  isInside = !isInside;
         }
         return isInside;
@@ -52,6 +52,7 @@ class Collision {
         var c = 0;
         this.playerPolygons.forEach(player => {
             if (!player.isKilled) {
+                if (player.isBot) player.draw()(this.game.context);
                 this.state = [];
                 this.rockPolygons.forEach(rock => {
                     if (this.canCollide(player, rock)) {
@@ -74,7 +75,6 @@ class Collision {
                 this.game.remLives--;
                 this.game.gameStarted = false;
             }
-            console.log(this.playerPolygons);
         });
     }
 
@@ -103,6 +103,8 @@ class Collision {
         return (context) => {
             var i = 0;
             this.bullets.forEach(bullet => {
+                cty2.lineTo(bullet.position.x, bullet.position.y);
+                cty2.stroke();
                 bullet.update();
                 this.playerPolygons.forEach(player => {
                     if (player == bullet.player) return;
@@ -168,7 +170,7 @@ class Collision {
 
             this.setCollisionState();
 
-            if (!(this.timer % 15)) {
+            if ((Math.ceil(this.timer) % 15 == 0)) {
                 if (this.game.botCount < 3) {
                     this.game.genBots();
                 }
@@ -178,6 +180,7 @@ class Collision {
                 this.guns.forEach(gun => {
                     if (!gun.hasBeenEquipped) {
                         this.guns.splice(c, 1);
+                        this.game.guns.splice(c, 1);
                         c++;
                     } else c++;
                 });

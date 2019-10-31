@@ -12,8 +12,8 @@ class Bullet {
         this.size = 0.7;
         this.angle = this.gun.hand.angle;
         this.origin = {
-            x : this.player.position.x + (this.player.width * this.player.scale) * ((this.faceRight) ? 0.2 : 0.2),
-            y : this.player.position.y + (this.player.height * this.player.scale * 0.2) 
+            x : this.player.position.x + (this.player.width * this.player.scale) * 0.3,
+            y : this.player.position.y + (this.player.height * this.player.scale * 0.2) + this.gun.width * Math.sin(this.angle) * 0.4
         }
         this.position = {
             x : undefined,

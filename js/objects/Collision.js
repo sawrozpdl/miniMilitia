@@ -66,12 +66,14 @@ class Collision {
                 });
                 c++;
             } else if (player.isBot) {
+                this.game.audios.dead.play();
                 this.playerPolygons.splice(c, 1);
                 this.game.botCount--;
                 this.game.playerKills++;
                 this.game.playerScore += 20;
                 c++;
             } else if (this.game.gameStarted){
+                this.game.audios.dead.play();
                 this.game.remLives--;
                 this.game.gameStarted = false;
             }
@@ -101,7 +103,7 @@ class Collision {
         temp2.height = this.game.mainBuffer.height;
 
         return (context) => {
-            var i = 0;
+            let i = 0;
             this.bullets.forEach(bullet => {
                 cty2.lineTo(bullet.position.x, bullet.position.y);
                 cty2.stroke();
@@ -135,7 +137,7 @@ class Collision {
                 }
             });
 
-            var k = 0;
+            let k = 0;
             this.powerUps.forEach(powerUp => {
                 if (!powerUp.isActive) {
                     this.powerUps.splice(k++, 1);
@@ -170,17 +172,14 @@ class Collision {
 
             this.setCollisionState();
 
-            if ((Math.ceil(this.timer) % 15 == 0)) {
+            if (this.timer > 45) {
                 if (this.game.botCount < 3) {
                     this.game.genBots();
                 }
-            }
-            if (this.timer > 45) {
                 let c = 0;
                 this.guns.forEach(gun => {
                     if (!gun.hasBeenEquipped) {
                         this.guns.splice(c, 1);
-                        this.game.guns.splice(c, 1);
                         c++;
                     } else c++;
                 });

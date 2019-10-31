@@ -2,8 +2,8 @@ import Entity from "./Entity.js";
 
 class Player extends Entity {
 
-    constructor(sprite, spriteData, position, mouse, scale, audio) {
-        super(sprite, spriteData, position, mouse, scale, audio);
+    constructor(params) {
+        super(params.sprite, params.spriteData, params.position, params.mouse, params.scale, params.audio);
         this.maxHealth = super.maxHealth * 3;
         this.health = super.health * 3;
         this.isBot =  false;

@@ -7,6 +7,8 @@ class Camera {
         this.visibleCtx = this.visible.getContext('2d');
         this.width = this.game.GAME_WIDTH;
         this.height = this.game.GAME_HEIGHT;
+        this.sWidth = 0;
+        this.sHeight = 0;
         this.visible.width = this.width;
         this.visible.height = this.height;
         this.map = false;
@@ -40,16 +42,16 @@ class Camera {
     update() {
         this.generateBackground(this.game.images.background);
         return (context) => {
-            var width = this.width * this.scope; // scoped width
-            var height = this.height * this.scope; // scoped height
-            if (this.game.player.isFacingRight) this.horizontalViewPoint = width / 4;
-            else this.horizontalViewPoint = - width / 4;
-            this.verticalViewpoint = this.game.player.parts.lHand.angle * height / 10;
+            this.sWidth = this.width * this.scope; // scoped width
+            this.sHeight = this.height * this.scope; // scoped height
+            if (this.game.player.isFacingRight) this.horizontalViewPoint = this.sWidth / 4;
+            else this.horizontalViewPoint = - this.sWidth / 4;
+            this.verticalViewpoint = this.game.player.parts.lHand.angle * this.sHeight / 10;
             
-            if (this.game.player.position.x > width / 2) 
-                this.xx = this.game.player.position.x - width / 2 + this.horizontalViewPoint;
-            if (this.game.player.position.y > height / 2) 
-                this.yy = this.game.player.position.y - height / 2 + this.verticalViewpoint;
+            if (this.game.player.position.x > this.sWidth / 2) 
+                this.xx = this.game.player.position.x - this.sWidth / 2 + this.horizontalViewPoint;
+            if (this.game.player.position.y > this.sHeight / 2) 
+                this.yy = this.game.player.position.y - this.sHeight / 2 + this.verticalViewpoint;
            
             this.dx = (this.xx - this.x) / 50;
             this.dy = (this.yy - this.y) / 50;    
@@ -60,7 +62,7 @@ class Camera {
             this.visibleCtx.drawImage(
                 this.game.mainBuffer,
                 this.x , this.y,
-                width, height,
+                this.sWidth, this.sHeight,
                 0, 0, this.width, this.height
             );
             this.game.mainContext.drawImage(this.visible, 0, 0, this.width, this.height);

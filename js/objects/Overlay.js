@@ -2,15 +2,18 @@ class Overlay {
 
     constructor(game) {
         this.game = game;
-        this.player = game.player;
-        this.sprite = game.sprite;
-        this.canvas = game.canvas;
-        this.context = game.mainContext;
-        this.lHand = game.player.parts.lHand;
-        this.rHand = game.player.parts.rHand;
+        this.init();
+    }
+
+    init() {
+        this.player = this.game.player;
+        this.sprite = this.game.sprite;
+        this.canvas = this.game.canvas;
+        this.context = this.game.mainContext;
+        this.lHand = this.game.player.parts.lHand;
+        this.rHand = this.game.player.parts.rHand;
         this.context.strokeStyle = 'white';
         this.context.lineWidth = 3;
-
         this.timer = 0;
     }
 
@@ -88,12 +91,12 @@ class Overlay {
 
     nextLife() {
         this.timer += (1 / 60);
-
         this.sprite.draw(this.game.playerType + "-head", this.context, 2000, 70, 0.5);
         this.context.fillStyle = 'rgba(0,0,0,0.8)';
         this.context.fillRect(0, 0, this.game.GAME_WIDTH, this.game.GAME_HEIGHT);
         this.context.fillStyle = 'white';
         this.context.fillText(`x  ${this.game.remLives}`, 2080, 110);
+        this.context.fillText('You were Killed!', 930, 360);
         this.context.fillText(`Respawning in  ${Math.floor(6 - this.timer)} Seconds`, 830, 450);
 
         if (this.timer < 5) return;
@@ -113,7 +116,7 @@ class Overlay {
                     this.drawStatus();
                 }
                 else {
-                    if (this.game.remLives == 0) this.showGameOver();
+                    if (this.game.remLives < 0) this.showGameOver();
                     else {
                         this.nextLife();
                     }

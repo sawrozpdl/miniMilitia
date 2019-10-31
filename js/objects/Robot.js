@@ -2,17 +2,16 @@ import Entity from './Entity.js';
 
 class Robot extends Entity {
 
-    constructor(sprite, position, mouse, scale, audios, difficulty) {
-        super(sprite, 'bot', position, mouse, scale, audios);
+    constructor(params) {
+        super(params.sprite, 'bot', params.position, params.mouse, params.scale, params.audios);
         this.isBot = true;
         this.gravity = 0;
         this.enemyDistance = 0;
         this.roamingDistance = this.genRandom(20, 320);
         this.dthruster = 0;
         this.rotation = 0;
-        this.difficulty = difficulty;
+        this.difficulty = params.difficulty;
     }
-
 
     stopFlying() {
         this.velocity.y = 0;

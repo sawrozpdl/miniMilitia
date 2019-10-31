@@ -13,6 +13,7 @@ class Gun {
         this.isEmpty = false;
         this.hasBeenEquipped = false;
         this.isReloading = false;
+        this.hasSettled = false;
         this.reloadTimer = 0;
         this.reloadSound = collision.game.audios.reload;
         this.sound = collision.game.audios[this.spriteName];
@@ -25,6 +26,8 @@ class Gun {
             x : undefined,
             y : undefined
         }
+        this.velocity = 0;
+        this.gravity = 0.3;
     }
 
     setOwner(playerHand) {
@@ -112,6 +115,7 @@ class Gun {
         this.position.y = this.hand.gPosition.y - this.height * this.scale;
         this.reloadSound.play();
         this.scale = 0.25; 
+        this.hasSettled = false;
     }
 
     draw(context) {
@@ -128,6 +132,12 @@ class Gun {
     }
 
     show(context) {
+        if (!this.hasSettled) {
+            this.centerPoint = {
+                x : this.position.x + this.width / 2,
+                y : this.position.y + this.height
+            }
+        }
         this.sprite.draw(this.spriteName, context,
             this.position.x, this.position.y,
             this.scale);

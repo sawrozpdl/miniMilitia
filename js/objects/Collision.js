@@ -132,6 +132,19 @@ class Collision {
                     if (this.canCollide(this.mainPlayer, gun)) {
                         this.game.canEquip = gun;
                     }
+                    if (!gun.hasSettled) {
+                        gun.velocity += gun.gravity;
+                        gun.position.y += gun.velocity;
+                        this.rockPolygons.forEach(rock => {
+                            if (this.canCollide(rock, gun)) {
+                                if (this.contains(gun.centerPoint, rock.points)) { // OPT
+                                    gun.hasSettled = true;
+                                    gun.velocity = 0;
+                                }
+                            }
+                        });
+                    }
+
                 }
             });
 

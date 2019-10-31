@@ -32,11 +32,11 @@ class Collision {
     }
 
     contains(point, points) {
-        var x = point.x;
-        var y = point.y;
-        var isInside = false;
-        var x1, y1, x2, y2;
-        for (var i = 0, j = points.length - 1; i < points.length; j = i++) {
+        let x = point.x;
+        let y = point.y;
+        let isInside = false;
+        let x1, y1, x2, y2;
+        for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
             x1 = points[i].x,
             y1 = points[i].y;
             x2 = points[j].x,
@@ -49,7 +49,7 @@ class Collision {
     }
 
     setCollisionState() {
-        var c = 0;
+        let c = 0;
         this.playerPolygons.forEach(player => {
             if (!player.isKilled) {
                 if (player.isBot) player.draw()(this.game.context);
@@ -105,8 +105,6 @@ class Collision {
         return (context) => {
             let i = 0;
             this.bullets.forEach(bullet => {
-                cty2.lineTo(bullet.position.x, bullet.position.y);
-                cty2.stroke();
                 bullet.update();
                 this.playerPolygons.forEach(player => {
                     if (player == bullet.player) return;

@@ -71,7 +71,7 @@ class Camera {
             context.strokeRect(0, 0, this.game.mainBuffer.width, this.game.mainBuffer.height);
             this.game.collision.playerPolygons.forEach(player => {
                 context.drawImage((player.isBot) ? this.game.images.arrowDownRed : this.game.images.arrowDown,
-                                   player.position.x + 5, player.position.y - 140, 100, 100);
+                                   player.position.x, player.position.y - 140, 100, 100);
             });
             if (this.map) {
                 this.game.mainContext.fillStyle = 'rgba(0, 0, 0, 0.5)';

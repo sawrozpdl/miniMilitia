@@ -46,6 +46,7 @@ class Main {
     }
 
     init() {
+        this.canvas.style.cursor = 'none';
         this.gunNames = ['uzi', 'ak47', 'm16', 'pistol'];
         this.gunCounter = 0;
         this.remLives = 3;

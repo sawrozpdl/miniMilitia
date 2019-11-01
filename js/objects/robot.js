@@ -114,9 +114,9 @@ class Robot extends Entity {
                 this.moveDown();
             else if ((this.enemyHeight < 0) && (Math.abs(this.enemyHeight) > this.roamingDistance * 1.2))
                 this.moveUp();
-            else if ((Math.random() < (0.05 * this.difficulty)) && !this.enemy.isKilled) {
+            else if ((Math.random() < (0.03 * this.difficulty)) && !this.enemy.isKilled) {
                 this.stop();
-                //this.shoot();
+                this.shoot();
             }
             return;
         }

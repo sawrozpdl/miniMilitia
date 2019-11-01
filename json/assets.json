@@ -1,0 +1,32 @@
+{
+    "images" : [
+        "./assets/images/spritesheet.png",
+        "./assets/images/background.png",
+        "./assets/images/background-main.png",
+        "./assets/images/blood.png",
+        "./assets/images/bullet.png",
+        "./assets/images/shell.png",
+        "./assets/images/tiles.png",
+        "./assets/images/arrowDown.png",
+        "./assets/images/arrowDownRed.png",
+        "./assets/images/gameOver.png"
+    ], 
+    "audios" : [
+        "./assets/audios/ak47.wav",
+        "./assets/audios/dead.wav",
+        "./assets/audios/explode.wav",
+        "./assets/audios/jet.wav",
+        "./assets/audios/land.wav",
+        "./assets/audios/m16.wav",
+        "./assets/audios/pistol.wav",
+        "./assets/audios/punch.wav",
+        "./assets/audios/reload.wav",
+        "./assets/audios/shotgun.wav",
+        "./assets/audios/swipe.wav",
+        "./assets/audios/switch.wav",
+        "./assets/audios/uzi.wav",
+        "./assets/audios/walk.wav"
+    ]
+
+    
+}

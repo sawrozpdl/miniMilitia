@@ -1,0 +1,20 @@
+Project: Clone of Mini Militia 
+			(Close to the original but mainly focuses on survival in single player)
+
+Basic Features:
+- Player is spawned at a location in a map with a pistol, which he/she can shoot with.
+- Guns like Ak47, M16, Uzi and pistols can be equipped.
+- Double guns can be equipped as well which is limited to small guns like Uzi and pistols.
+- Implementation of Polygon collision in the game.
+-  Player has vector body parts
+- Basic physics implemented (eg: when player throws a grenade while speeding the grenade gets extra horizontal velocity … )
+- Player can move freely around the map and can fly up temporarily using thrusters which is limited but need to recharge over time for the user to use again.
+- Enemy bots and drones (Basic AI) are spawned randomly around the visible map. they carry guns and shoot the player given the path between them and the player is clear.
+- Player have limited health indicated in the health bar which also regenerates with time.
+- Player can pick up and switch guns and throw grenades
+
+Extra Features: 
+- Game can be played on a LAN with other players. 
+- Account creation for saving progress.
+- More guns to the game (flameThrower, rocket launcher, sniper)
+
